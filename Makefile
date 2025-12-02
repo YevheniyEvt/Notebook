@@ -2,8 +2,7 @@ DJANGO_PROJECT_DIR := src/notebook
 
 .PHONY: run
 run:
-	cd $(DJANGO_PROJECT_DIR) && \
-	uv run manage.py runserver
+	uv run src/notebook/manage.py runserver
 
 .PHONY: makemigrations
 makemigrations:
