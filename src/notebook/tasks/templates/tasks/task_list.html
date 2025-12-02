@@ -1,0 +1,15 @@
+{% extends 'base.htm' %}
+
+
+{% block content %}
+<a href="{% url 'tasks:task_create' %}">Create new</a>
+{% for task in tasks %}
+    <a href="{% url 'tasks:task_update' task.id %}">
+        <p class="text-info">{{ task }}</p>
+    </a>
+    <form action="{% url 'tasks:task_delete' task.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="button button-primary">Delete</button>
+    </form>
+{% endfor %}
+{% endblock content %}
