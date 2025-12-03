@@ -1,11 +1,27 @@
-{% extends 'base.htm' %}
-{% block content %}
-<a href="{% url 'tasks:task_list' %}">All tasks</a>
+{% load crispy_forms_tags %}
 
-<form method="post" action={% url 'tasks:task_create' %}>
-    {% csrf_token %}
-    {{ form.as_p }}
-<button type="submit">Submit</button>
-</form>
-{% endblock content %}
+<div class="modal-content">
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="createTaskModalLabel">New task</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body" >
+    {% crispy form %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button class="btn btn-primary"
+            {% if 'create' in request.path %}
+            hx-post="{% url 'tasks:task_create' %}"
+            {% else %}
+            hx-post="{% url 'tasks:task_update' form.instance.id %}"
+            {% endif %}
+            hx-include="#hx-create-task-form"
+            hx-target="#createTaskModalDialog"
+    >
+        Save
+    </button>
+  </div>
+</div>
+
 

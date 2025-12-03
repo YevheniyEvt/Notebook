@@ -1,0 +1,35 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="createTaskModalLabel">Deadline: {{ task.end_date }}</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body" >
+    <div class="bg-body-tertiary p-3 rounded text-start">
+        <h3>{{ task.title }}</h3>
+        <p class="lead">{{ task.description }}</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    {% if task.can_be_completed %}
+        <button type="button"
+                class="btn btn-outline-success rounded-pill btn-sm"
+                hx-post="{% url 'tasks:task_complete' task.id %}">
+            Complete task
+        </button>
+    {% endif %}
+    {% if task.can_be_canceled %}
+        <button type="button"
+                class="btn btn-outline-warning rounded-pill btn-sm"
+                hx-post="{% url 'tasks:task_cancel' task.id %}">
+            Cancel task
+        </button>
+    {% endif %}
+    {% if task.can_be_opened %}
+        <button type="button"
+                class="btn btn-outline-info rounded-pill btn-sm"
+                hx-post="{% url 'tasks:task_open' task.id %}">
+            Open task
+        </button>
+    {% endif %}
+  </div>
+</div>
