@@ -11,9 +11,9 @@ from django.urls import reverse
 
 class Task(models.Model):
     class Status(models.TextChoices):
-        COMPLETED = 'completed', 'Completed'
-        IN_PROGRESS = 'in_progress', 'In Progress'
-        CANCELED = 'canceled', 'Canceled'
+        COMPLETED = 'completed'
+        IN_PROGRESS = 'in_progress'
+        CANCELED = 'canceled'
 
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -22,6 +22,8 @@ class Task(models.Model):
     status = models.CharField(choices=Status.choices, default=Status.IN_PROGRESS)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ('end_date',)
 
     def __str__(self):
         return f'{self.title}|{self.end_date}'

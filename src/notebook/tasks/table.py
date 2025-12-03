@@ -5,8 +5,8 @@ from .models import Task
 
 class TaskTable(tables.Table):
     description = tables.TemplateColumn(orderable=False, verbose_name="Description", template_name="tasks/table/description_task_field.html")
-    start_date = tables.Column(attrs={'td':{"style": "vertical-align: middle;"}})
-    end_date = tables.Column(attrs={'td': {"style": "vertical-align: middle;"}})
+    start_date = tables.Column(attrs={'td':{"style": "vertical-align: middle;", 'class': 'text-nowrap'}})
+    end_date = tables.Column(attrs={'td': {"style": "vertical-align: middle;", 'class': 'text-nowrap'}})
     action = tables.TemplateColumn(orderable=False, verbose_name="", template_name="tasks/table/action_field.html", attrs={'td': {"style": "vertical-align: middle;"}})
 
     class Meta:
@@ -21,3 +21,5 @@ class TaskTable(tables.Table):
             else "table-success" if record.is_completed
             else ""
         )}
+
+        empty_text = 'No tasks'

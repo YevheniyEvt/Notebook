@@ -1,23 +1,32 @@
 from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django_filters.views import FilterView
 from django_htmx.http import HttpResponseClientRedirect
+from django_tables2 import SingleTableView
 
+from .filter import TaskFilter
 from .forms import TaskForm
 from .models import Task
-from django_tables2 import SingleTableView
+
 
 from .table import TaskTable
 
 
-class TaskListView(SingleTableView):
+class TaskListView(FilterView, SingleTableView):
     model = Task
     table_class = TaskTable
+    filterset_class = TaskFilter
     template_name = 'tasks/task_list.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return self.template_name + '#django_table'
+        return self.template_name
 
 
 class TaskDetailView(DeleteView):
@@ -26,7 +35,7 @@ class TaskDetailView(DeleteView):
     context_object_name = 'task'
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
 
 class TaskCreateView(CreateView):
@@ -35,7 +44,7 @@ class TaskCreateView(CreateView):
     form_class = TaskForm
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -51,7 +60,7 @@ class TaskUpdateView(UpdateView):
     template_name = 'tasks/partials/create_task_modal.html'
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -66,7 +75,7 @@ class TaskDeleteView(DeleteView):
     success_url = reverse_lazy('tasks:task_list')
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
@@ -75,15 +84,17 @@ class TaskDeleteView(DeleteView):
 
 class SetTaskStatusView(UpdateView):
     model = Task
-    action = None
+    new_status = None
 
     def dispatch(self, request, *args, **kwargs):
-        if self.action is None:
-            raise AttributeError('Action must be specified')
+        if self.new_status is None or self.new_status not in Task.Status:
+            raise AttributeError(
+                f'new_status attr must be specified. Choices are {Task.Status.values}'
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
 
     def post(self, request, *args, **kwargs):
         task = self.get_object()
@@ -91,12 +102,5 @@ class SetTaskStatusView(UpdateView):
         return HttpResponseClientRedirect(reverse('tasks:task_list'))
 
     def set_task_status(self, task):
-        if self.action == task.Status.COMPLETED:
-            task.status = task.Status.COMPLETED
-            task.save()
-        elif self.action == task.Status.IN_PROGRESS:
-            task.status = task.Status.IN_PROGRESS
-            task.save()
-        elif self.action == task.Status.CANCELED:
-            task.status = task.Status.CANCELED
-            task.save()
+        task.status = self.new_status
+        task.save()

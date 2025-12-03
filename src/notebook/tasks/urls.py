@@ -1,5 +1,4 @@
 from django.urls import path
-from mypy.dmypy.client import action
 
 from .models import Task
 from .views import TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, TaskDetailView, SetTaskStatusView
@@ -13,8 +12,8 @@ urlpatterns = [
     path("update/<int:pk>", TaskUpdateView.as_view(), name="task_update"),
     path("delete/<int:pk>", TaskDeleteView.as_view(), name="task_delete"),
 
-    path("task-completed/<int:pk>", SetTaskStatusView.as_view(action=Task.Status.COMPLETED), name="task_complete"),
-    path("task-canceled/<int:pk>", SetTaskStatusView.as_view(action=Task.Status.CANCELED), name="task_cancel"),
-    path("task-open/<int:pk>", SetTaskStatusView.as_view(action=Task.Status.IN_PROGRESS), name="task_open"),
+    path("task-completed/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.COMPLETED), name="task_complete"),
+    path("task-canceled/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.CANCELED), name="task_cancel"),
+    path("task-open/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.IN_PROGRESS), name="task_open"),
 
 ]

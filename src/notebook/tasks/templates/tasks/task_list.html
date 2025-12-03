@@ -1,5 +1,5 @@
 {% extends 'base.htm' %}
-{% load django_tables2 %}
+{% load django_tables2 partials %}
 {% block css %}
 <style>
     .custom-tabs {
@@ -59,7 +59,7 @@
                         aria-controls="active-tasks"
                         aria-selected="true"
                         hx-trigger="load, click, rerenderTaskTable from:body"
-                        hx-get="{% url 'tasks:task_list' %}"
+                        hx-get="{% url 'tasks:task_list' %}?status=in_progress"
                         hx-target="#active-tasks"
                         hx-select=".table-container"
                 >
@@ -75,7 +75,7 @@
                         aria-controls="completed-tasks"
                         aria-selected="false"
                         hx-trigger="click"
-                        hx-get="{% url 'tasks:task_list' %}"
+                        hx-get="{% url 'tasks:task_list' %}?status=completed"
                         hx-target="#completed-tasks"
                         hx-select=".table-container"
                 >
@@ -91,7 +91,7 @@
                         aria-controls="canceled-tasks"
                         aria-selected="false"
                         hx-trigger="click"
-                        hx-get="{% url 'tasks:task_list' %}"
+                        hx-get="{% url 'tasks:task_list' %}?status=canceled"
                         hx-target="#canceled-tasks"
                         hx-select=".table-container"
                 >
@@ -127,12 +127,18 @@
 
             </div>
             <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="contact-tab">
-                {% render_table table %}
+
             </div>
         </div>
     </div>
 </div>
-<!-- Modal -->
+
+<!-- Partials -->
+{% partialdef django_table %}
+    {% render_table table %}
+{% endpartialdef django_table %}
+
+<!-- Modals -->
 <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" id="createTaskModalDialog">
 

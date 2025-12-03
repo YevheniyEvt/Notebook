@@ -1,5 +1,5 @@
 <div class="bg-body-tertiary p-3 rounded text-start">
-    <a href="#" {% if record.is_terminated %} class="link-danger" {% else %} class="link-primary" {% endif %}
+    <a href="#" {% if record.is_terminated and record.is_in_progress %} class="link-danger" {% else %} class="link-primary" {% endif %}
         data-bs-toggle="modal"
         data-bs-target="#detailTaskModal"
         hx-get="{% url 'tasks:task_detail' record.id %}"
@@ -8,5 +8,5 @@
         <h3>{{ record.title }}</h3>
     </a>
 
-    <p class="lead">{{ record.description }}</p>
+    <p class="lead {% if record.is_terminated and record.is_in_progress %} text-danger {% endif %}">{{ record.description }}</p>
 </div>
