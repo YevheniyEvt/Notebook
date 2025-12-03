@@ -184,4 +184,6 @@ fabric.properties
 # idea folder, uncomment if you don't need it
 .idea
 
- src/notebook/db.sqlite3
+# Ignore all SQLite database files
+*.sqlite3
+*.db
