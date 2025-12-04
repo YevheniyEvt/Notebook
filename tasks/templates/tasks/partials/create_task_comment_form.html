@@ -1,0 +1,11 @@
+{% load crispy_forms_tags %}
+
+{% crispy form %}
+<button class="btn btn-primary"
+      hx-post="{% url 'tasks:comment_create' task.id %}"
+      hx-include="#hx-task-comment-form"
+      hx-target="#comment-form"
+      hx-swap="innerHTML"
+>
+  Add comment
+</button>

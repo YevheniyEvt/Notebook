@@ -1,0 +1,22 @@
+[project]
+name = "notebook"
+version = "0.1.0"
+description = "Notebook for my planning and tasks"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "crispy-bootstrap5>=2025.6",
+    "django>=6.0",
+    "django-crispy-forms>=2.5",
+    "django-extensions>=4.1",
+    "django-filter>=25.2",
+    "django-htmx>=1.27.0",
+    "django-tables2>=2.8.0",
+    "django-template-partials>=25.3",
+    "django-widget-tweaks>=1.5.0",
+    "ipython>=9.8.0",
+    "mypy>=1.19.0",
+    "python-decouple>=3.8",
+    "python-dotenv>=1.2.1",
+    "ruff>=0.14.8",
+]

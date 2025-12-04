@@ -1,0 +1,32 @@
+<div class="btn-group">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Actions
+  </button>
+  <ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item"
+           href="#"
+           data-bs-toggle="modal"
+           data-bs-target="#createTaskModal"
+           hx-get="{% url 'tasks:task_update' record.id %}"
+           hx-target="#createTaskModalDialog"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item"
+           href="#"
+           hx-delete="{% url 'tasks:task_delete' record.id %}"
+           hx-target="closest tr"
+           hx-swap='delete'
+           hx-confirm="Delete task?"
+        >
+            <i class="bi bi-trash text-danger"></i>
+            Delete
+        </a>
+    </li>
+{#    <li><hr class="dropdown-divider"></li>#}
+  </ul>
+</div>
