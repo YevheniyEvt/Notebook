@@ -9,24 +9,32 @@
         <p class="lead">{{ task.description }}</p>
     </div>
 
-    {% for comment in task.comments.all %}
-        <div class="d-flex justify-content-between align-items-center border-top py-2"
-             hx-target="this"
-             hx-swap="delete"
-        >
-            <p class="lead mb-0">{{ comment.comment }}</p>
-
-            <a href="#"
-               hx-delete="{% url 'tasks:comment_delete' comment.id %}"
-               class="text-danger"
+    <div id="task-comments"
+         hx-get="{% url 'tasks:task_detail' task.id %}"
+         hx-target="this"
+         hx-trigger="refreshTaskDetail from:body"
+         hx-select="#task-comments"
+         hx-swap="outerHTML"
+    >
+        {% for comment in task.comments.all %}
+            <div class="d-flex justify-content-between align-items-center border-top py-2"
+                 hx-target="this"
+                 hx-swap="delete"
             >
-                <i class="bi bi-trash"></i>
-            </a>
-        </div>
-    {% endfor %}
+                <p class="lead mb-0">{{ comment.comment }}</p>
 
-    <div id="comment-form" hx-get="{% url 'tasks:comment_create' task.id %}" hx-trigger="load">
-        {# comment form #}
+                <a href="#"
+                   hx-delete="{% url 'tasks:comment_delete' comment.id %}"
+                   class="text-danger"
+                >
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="comment-form" hx-get="{% url 'tasks:comment_create' task.id %}" hx-trigger="load, refreshTaskDetail from:body">
+        <!-- HTMX will inject content here -->
     </div>
   </div>
   <div class="modal-footer">

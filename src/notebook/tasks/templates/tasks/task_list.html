@@ -74,7 +74,7 @@
                         type="button" role="tab"
                         aria-controls="completed-tasks"
                         aria-selected="false"
-                        hx-trigger="click"
+                        hx-trigger="click, rerenderTaskTable from:body"
                         hx-get="{% url 'tasks:task_list' %}?status=completed"
                         hx-target="#completed-tasks"
                         hx-select=".table-container"
@@ -90,7 +90,7 @@
                         type="button" role="tab"
                         aria-controls="canceled-tasks"
                         aria-selected="false"
-                        hx-trigger="click"
+                        hx-trigger="click, rerenderTaskTable from:body"
                         hx-get="{% url 'tasks:task_list' %}?status=canceled"
                         hx-target="#canceled-tasks"
                         hx-select=".table-container"
@@ -106,7 +106,7 @@
                         type="button" role="tab"
                         aria-controls="all-tasks"
                         aria-selected="false"
-                        hx-trigger="click"
+                        hx-trigger="click, rerenderTaskTable from:body"
                         hx-get="{% url 'tasks:task_list' %}"
                         hx-target="#all-tasks"
                         hx-select=".table-container"
@@ -118,13 +118,13 @@
         </ul>
         <div class="tab-content" id="tasksContent">
             <div class="tab-pane fade show active" id="active-tasks" role="tabpanel" aria-labelledby="active-tasks-tab">
-
+                <!-- HTMX will inject content here -->
             </div>
             <div class="tab-pane fade" id="completed-tasks" role="tabpanel" aria-labelledby="profile-tab">
-
+                <!-- HTMX will inject content here -->
             </div>
             <div class="tab-pane fade" id="canceled-tasks" role="tabpanel" aria-labelledby="contact-tab">
-
+                <!-- HTMX will inject content here -->
             </div>
             <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="contact-tab">
 
@@ -139,15 +139,19 @@
 {% endpartialdef django_table %}
 
 <!-- Modals -->
-<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true"
+     _="on closeModal send click to .btn-close"
+>
   <div class="modal-dialog modal-dialog-centered modal-lg" id="createTaskModalDialog">
-
+    <!-- HTMX will inject content here -->
   </div>
 </div>
 
-<div class="modal fade" id="detailTaskModal" tabindex="-1" aria-labelledby="detailTaskModalLabel" aria-hidden="true">
+<div class="modal fade" id="detailTaskModal" tabindex="-1" aria-labelledby="detailTaskModalLabel" aria-hidden="true"
+     _="on closeModal send click to .btn-close"
+>
   <div class="modal-dialog modal-dialog-centered modal-lg" id="detailTaskModalDialog">
-
+    <!-- HTMX will inject content here -->
   </div>
 </div>
 {% endblock content %}

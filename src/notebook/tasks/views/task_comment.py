@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView
-
+from django_htmx.http import trigger_client_event
 
 from ..forms import TaskCommentForm
 from ..models import Task, TaskComment
@@ -27,9 +27,11 @@ class TaskCommentCreateView(CreateView):
         form.instance.task = task
         if self.request.htmx:
             form.save()
-            return self.render_to_response({'form': form, 'task': task})
-        response = super().form_valid(form)
-        return response
+            response = self.render_to_response({'form': form, 'task': task})
+            trigger_client_event(response, 'refreshTaskDetail')
+            return response
+
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,5 +47,8 @@ class TaskCommentDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         if self.request.htmx:
             self.get_object().delete()
-            return HttpResponse()
+            response = HttpResponse()
+            trigger_client_event(response, 'refreshTaskDetail')
+            return response
+
         return super().delete(request, *args, **kwargs)

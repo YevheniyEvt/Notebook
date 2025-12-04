@@ -1,8 +1,8 @@
 from django.http import HttpResponse
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
-from django_htmx.http import HttpResponseClientRedirect
+from django_htmx.http import trigger_client_event
 from django_tables2 import SingleTableView
 
 from ..filter import TaskFilter
@@ -57,9 +57,12 @@ class TaskCreateView(CreateView):
         form.instance.user = self.request.user
         if self.request.htmx:
             form.save()
-            return HttpResponseClientRedirect(reverse('tasks:task_list'))
-        response = super().form_valid(form)
-        return response
+            response = HttpResponse()
+            trigger_client_event(response, 'rerenderTaskTable')
+            trigger_client_event(response, 'closeModal')
+            return response
+
+        return super().form_valid(form)
 
 
 class TaskUpdateView(UpdateView):
@@ -74,9 +77,12 @@ class TaskUpdateView(UpdateView):
         form.instance.user = self.request.user
         if self.request.htmx:
             form.save()
-            return HttpResponseClientRedirect(reverse('tasks:task_list'))
-        response = super().form_valid(form)
-        return response
+            response = HttpResponse()
+            trigger_client_event(response, 'rerenderTaskTable')
+            trigger_client_event(response, 'closeModal')
+            return response
+
+        return super().form_valid(form)
 
 
 class TaskDeleteView(DeleteView):
@@ -87,8 +93,10 @@ class TaskDeleteView(DeleteView):
         return super().get_queryset().filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return HttpResponse()
+        self.get_object().delete()
+        response = HttpResponse()
+        trigger_client_event(response, 'rerenderTaskTable')
+        return response
 
 
 class SetTaskStatusView(UpdateView):
@@ -108,7 +116,10 @@ class SetTaskStatusView(UpdateView):
     def post(self, request, *args, **kwargs):
         task = self.get_object()
         self.set_task_status(task)
-        return HttpResponseClientRedirect(reverse('tasks:task_list'))
+        response = HttpResponse()
+        trigger_client_event(response, 'rerenderTaskTable')
+        trigger_client_event(response, 'closeModal')
+        return response
 
     def set_task_status(self, task):
         task.status = self.new_status
