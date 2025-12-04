@@ -4,7 +4,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 from django import forms
 
-from .models import Task, TaskComment
+from notebook.tasks.models import Task, TaskComment
+
 
 
 class TaskForm(forms.ModelForm):

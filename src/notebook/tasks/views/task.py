@@ -5,11 +5,12 @@ from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 from django_tables2 import SingleTableView
 
-from ..filter import TaskFilter
-from ..forms import TaskForm
-from ..models import Task
+from notebook.mixins import HTMXViewFormMixin
+from notebook.tasks.filter import TaskFilter
+from notebook.tasks.forms import TaskForm
+from notebook.tasks.models import Task
 
-from ..table import TaskTable
+from notebook.tasks.table import TaskTable
 
 __all__ = [
     'TaskListView',
@@ -45,48 +46,33 @@ class TaskDetailView(DeleteView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class TaskCreateView(CreateView):
+class TaskCreateView(HTMXViewFormMixin, CreateView):
     model = Task
     template_name = 'tasks/partials/create_task_modal.html'
     form_class = TaskForm
+    htmx_client_events = ['rerenderTaskTable', 'closeModal']
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        if self.request.htmx:
-            form.save()
-            response = HttpResponse()
-            trigger_client_event(response, 'rerenderTaskTable')
-            trigger_client_event(response, 'closeModal')
-            return response
-
         return super().form_valid(form)
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(HTMXViewFormMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'tasks/partials/create_task_modal.html'
+    htmx_client_events = ['rerenderTaskTable', 'closeModal']
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        if self.request.htmx:
-            form.save()
-            response = HttpResponse()
-            trigger_client_event(response, 'rerenderTaskTable')
-            trigger_client_event(response, 'closeModal')
-            return response
-
-        return super().form_valid(form)
 
 
 class TaskDeleteView(DeleteView):
     model = Task
+    http_method_names = ['delete']
     success_url = reverse_lazy('tasks:task_list')
 
     def get_queryset(self):
@@ -101,6 +87,7 @@ class TaskDeleteView(DeleteView):
 
 class SetTaskStatusView(UpdateView):
     model = Task
+    http_method_names = ['post']
     new_status = None
 
     def dispatch(self, request, *args, **kwargs):
