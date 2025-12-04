@@ -1,15 +1,184 @@
 {% extends 'base.htm' %}
+{% load django_tables2 partials %}
+{% block css %}
+<style>
+    .custom-tabs {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
+    .custom-tabs .nav-link {
+        color: #495057;
+        border: none;
+        padding: 15px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .custom-tabs .nav-link.active {
+        color: #fff;
+        background-color: #007bff;
+        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+    }
+
+    .custom-tabs .tab-content {
+        padding: 30px;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock css %}
 
 {% block content %}
-<a href="{% url 'tasks:task_create' %}">Create new</a>
-{% for task in tasks %}
-    <a href="{% url 'tasks:task_update' task.id %}">
-        <p class="text-info">{{ task }}</p>
-    </a>
-    <form action="{% url 'tasks:task_delete' task.id %}" method="post">
-    {% csrf_token %}
-    <button type="submit" class="button button-primary">Delete</button>
-    </form>
-{% endfor %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Tasks</h2>
+    <div class="custom-tabs">
+        <ul class="nav nav-tabs" id="tasks" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="active-tasks-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#active-tasks"
+                        type="button"
+                        role="tab"
+                        aria-controls="active-tasks"
+                        aria-selected="true"
+                        hx-trigger="load, click, rerenderTaskTable from:body"
+                        hx-get="{% url 'tasks:task_list' %}?status=in_progress"
+                        hx-target="#active-tasks"
+                        hx-select=".table-container"
+                >
+                    Active
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="completed-tasks-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#completed-tasks"
+                        type="button" role="tab"
+                        aria-controls="completed-tasks"
+                        aria-selected="false"
+                        hx-trigger="click, rerenderTaskTable from:body"
+                        hx-get="{% url 'tasks:task_list' %}?status=completed"
+                        hx-target="#completed-tasks"
+                        hx-select=".table-container"
+                >
+                    Completed
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="canceled-tasks-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#canceled-tasks"
+                        type="button" role="tab"
+                        aria-controls="canceled-tasks"
+                        aria-selected="false"
+                        hx-trigger="click, rerenderTaskTable from:body"
+                        hx-get="{% url 'tasks:task_list' %}?status=canceled"
+                        hx-target="#canceled-tasks"
+                        hx-select=".table-container"
+                >
+                    Canceled
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="all-tasks-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#all-tasks"
+                        type="button" role="tab"
+                        aria-controls="all-tasks"
+                        aria-selected="false"
+                        hx-trigger="click, rerenderTaskTable from:body"
+                        hx-get="{% url 'tasks:task_list' %}"
+                        hx-target="#all-tasks"
+                        hx-select=".table-container"
+
+                >
+                    All
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="tasksContent">
+            <div class="tab-pane fade show active" id="active-tasks" role="tabpanel" aria-labelledby="active-tasks-tab">
+                <!-- HTMX will inject content here -->
+            </div>
+            <div class="tab-pane fade" id="completed-tasks" role="tabpanel" aria-labelledby="profile-tab">
+                <!-- HTMX will inject content here -->
+            </div>
+            <div class="tab-pane fade" id="canceled-tasks" role="tabpanel" aria-labelledby="contact-tab">
+                <!-- HTMX will inject content here -->
+            </div>
+            <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="contact-tab">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Partials -->
+{% partialdef django_table %}
+    {% render_table table %}
+{% endpartialdef django_table %}
+
+<!-- Modals -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true"
+     _="on closeModal send click to .btn-close"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" id="createTaskModalDialog">
+    <!-- HTMX will inject content here -->
+  </div>
+</div>
+
+<div class="modal fade" id="detailTaskModal" tabindex="-1" aria-labelledby="detailTaskModalLabel" aria-hidden="true"
+     _="on closeModal send click to .btn-close"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" id="detailTaskModalDialog">
+    <!-- HTMX will inject content here -->
+  </div>
+</div>
 {% endblock content %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabLinks = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-pane');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-bs-target').substring(1);
+                const targetContent = document.getElementById(targetId);
+
+                tabContents.forEach(content => {
+                    content.classList.remove('fade-in');
+                });
+
+                setTimeout(() => {
+                    targetContent.classList.add('fade-in');
+                }, 50);
+            });
+        });
+    });
+</script>
+{% endblock js %}
+
+
+
