@@ -8,6 +8,26 @@
         <h3>{{ task.title }}</h3>
         <p class="lead">{{ task.description }}</p>
     </div>
+
+    {% for comment in task.comments.all %}
+        <div class="d-flex justify-content-between align-items-center border-top py-2"
+             hx-target="this"
+             hx-swap="delete"
+        >
+            <p class="lead mb-0">{{ comment.comment }}</p>
+
+            <a href="#"
+               hx-delete="{% url 'tasks:comment_delete' comment.id %}"
+               class="text-danger"
+            >
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    {% endfor %}
+
+    <div id="comment-form" hx-get="{% url 'tasks:comment_create' task.id %}" hx-trigger="load">
+        {# comment form #}
+    </div>
   </div>
   <div class="modal-footer">
     {% if task.can_be_completed %}

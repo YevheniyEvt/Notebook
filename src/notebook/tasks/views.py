@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
@@ -6,9 +7,8 @@ from django_htmx.http import HttpResponseClientRedirect
 from django_tables2 import SingleTableView
 
 from .filter import TaskFilter
-from .forms import TaskForm
-from .models import Task
-
+from .forms import TaskForm, TaskCommentForm
+from .models import Task, TaskComment
 
 from .table import TaskTable
 
@@ -48,9 +48,10 @@ class TaskCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        response = super().form_valid(form)
         if self.request.htmx:
+            form.save()
             return HttpResponseClientRedirect(reverse('tasks:task_list'))
+        response = super().form_valid(form)
         return response
 
 
@@ -64,9 +65,10 @@ class TaskUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        response = super().form_valid(form)
         if self.request.htmx:
+            form.save()
             return HttpResponseClientRedirect(reverse('tasks:task_list'))
+        response = super().form_valid(form)
         return response
 
 
@@ -104,3 +106,40 @@ class SetTaskStatusView(UpdateView):
     def set_task_status(self, task):
         task.status = self.new_status
         task.save()
+
+
+class TaskCommentCreateView(CreateView):
+    model = TaskComment
+    form_class = TaskCommentForm
+    template_name = 'tasks/partials/create_task_comment_form.html'
+    success_url = reverse_lazy('tasks:task_list')
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+    def form_valid(self, form):
+        task = get_object_or_404(Task, pk=self.kwargs['pk'])
+        form.instance.user = self.request.user
+        form.instance.task = task
+        if self.request.htmx:
+            form.save()
+            return self.render_to_response({'form': form, 'task': task})
+        response = super().form_valid(form)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task'] = get_object_or_404(Task, pk=self.kwargs['pk'])
+        return context
+
+class TaskCommentDeleteView(DeleteView):
+    model = TaskComment
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        if self.request.htmx:
+            self.get_object().delete()
+            return HttpResponse()
+        return super().delete(request, *args, **kwargs)

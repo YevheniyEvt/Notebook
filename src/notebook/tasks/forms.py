@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 from django import forms
 
-from .models import Task
+from .models import Task, TaskComment
 
 
 class TaskForm(forms.ModelForm):
@@ -31,3 +31,21 @@ class TaskForm(forms.ModelForm):
             'title',
             'description',
         )
+
+class TaskCommentForm(forms.ModelForm):
+    comment = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 4}),
+        required=True,
+        max_length=200
+    )
+    class Meta:
+        model = TaskComment
+        fields = ( 'comment',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'hx-task-comment-form'
+        self.helper.form_class = 'blueForms'
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'submit_survey'

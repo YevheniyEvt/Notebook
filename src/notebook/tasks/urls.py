@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .models import Task
-from .views import TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, TaskDetailView, SetTaskStatusView
+from .views import TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, TaskDetailView, SetTaskStatusView, \
+    TaskCommentCreateView, TaskCommentDeleteView
 
 app_name = "tasks"
 
@@ -15,5 +16,8 @@ urlpatterns = [
     path("task-completed/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.COMPLETED), name="task_complete"),
     path("task-canceled/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.CANCELED), name="task_cancel"),
     path("task-open/<int:pk>", SetTaskStatusView.as_view(new_status=Task.Status.IN_PROGRESS), name="task_open"),
+
+    path("comment/create/<int:pk>", TaskCommentCreateView.as_view(), name="comment_create"),
+    path("comment/delete/<int:pk>", TaskCommentDeleteView.as_view(), name="comment_delete"),
 
 ]
