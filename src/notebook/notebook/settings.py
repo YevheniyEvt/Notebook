@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "template_partials",
 
-    "tasks.apps.TasksConfig",
+    "notebook.tasks.apps.TasksConfig",
 ]
 
 MIDDLEWARE = [

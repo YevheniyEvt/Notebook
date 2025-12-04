@@ -4,8 +4,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView
 from django_htmx.http import trigger_client_event
 
-from ..forms import TaskCommentForm
-from ..models import Task, TaskComment
+from notebook.tasks.forms import TaskCommentForm
+from notebook.tasks.models import Task, TaskComment
 
 __all__ = [
     'TaskCommentCreateView',

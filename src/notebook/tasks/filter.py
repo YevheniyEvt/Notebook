@@ -1,6 +1,6 @@
 import django_filters
 
-from .models import Task
+from notebook.tasks.models import Task
 
 
 class TaskFilter(django_filters.FilterSet):
