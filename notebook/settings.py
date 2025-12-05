@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "template_partials",
 
     "tasks.apps.TasksConfig",
+    "daybook.apps.DaybookConfig",
 ]
 
 MIDDLEWARE = [
