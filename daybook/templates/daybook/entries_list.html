@@ -1,0 +1,37 @@
+{% extends 'base.htm' %}
+{% block content %}
+<div id="entries-article"
+     hx-get="{% url 'daybook:entries_list' %}"
+     hx-trigger="rerenderEntriesList from:body"
+     hx-select="#entries-article"
+     hx-swap="outerHTML"
+>
+{% for entry in entries_list %}
+    <article class="mt-4">
+        <h2 class="mb-1">
+            {% if entry.title %}
+                {{ entry.title }}
+            {% endif %}
+        </h2>
+        <p class="blog-post-meta">
+          {{ entry.created_at }}
+        </p>
+        <p>
+          {{ entry.text }}
+        </p>
+        <hr />
+    </article>
+{% endfor %}
+</div>
+
+
+<!-- Modals -->
+<div class="modal fade" id="createEntriesModal" tabindex="-1" aria-labelledby="createEntriesModalLabel" aria-hidden="true"
+     _="on closeModal send click to .btn-close"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" id="createEntriesModalDialog">
+    <!-- HTMX will inject content here -->
+  </div>
+</div>
+
+{% endblock content %}

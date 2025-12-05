@@ -1,0 +1,27 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-content">
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="createTaskModalLabel">{% if form.instance.id %}Update entries{% else %}New entries{% endif %}</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body" >
+    {% crispy form %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button class="btn btn-primary"
+            {% if form.instance.id %}
+            hx-post="{% url 'daybook:entries_update' form.instance.id %}"
+            {% else %}
+            hx-post="{% url 'daybook:entries_create' %}"
+            {% endif %}
+            hx-include="#hx-entries-form"
+            hx-target="#createEntriesModalDialog"
+    >
+        Save
+    </button>
+  </div>
+</div>
+
+
