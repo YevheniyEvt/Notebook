@@ -1,0 +1,6 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif/*rtl:Amiri, Georgia, "Times New Roman", serif*/;
+}
+.header-content {
+    background-color: rgba(0, 123, 255, 0.8);
+}

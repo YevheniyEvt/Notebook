@@ -1,52 +1,32 @@
 {% extends 'base.htm' %}
-{% load django_tables2 partials %}
+{% load django_tables2 partials static %}
+
 {% block css %}
-<style>
-    .custom-tabs {
-        background-color: #f8f9fa;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .custom-tabs .nav-link {
-        color: #495057;
-        border: none;
-        padding: 15px 25px;
-        transition: all 0.3s ease;
-    }
-
-    .custom-tabs .nav-link.active {
-        color: #fff;
-        background-color: #007bff;
-        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
-    }
-
-    .custom-tabs .tab-content {
-        padding: 30px;
-    }
-
-    .fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'tasks/style.css' %}">
 {% endblock css %}
 
+{% block header %}
+<div class="container my-3">
+  <nav aria-label="breadcrumb">
+    <ol
+      class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3"
+    >
+      <li class="breadcrumb-item">
+        <a class="link-body-emphasis" href="{% url 'index' %}">
+          <svg class="bi" width="16" height="16" aria-hidden="true">
+            <use xlink:href="#house-door-fill"></use>
+          </svg>
+          <span class="visually-hidden">Home</span>
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Tasks</li>
+    </ol>
+  </nav>
+</div>
+{% endblock header %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Tasks</h2>
+<div class="container">
     <div class="custom-tabs">
         <ul class="nav nav-tabs" id="tasks" role="tablist">
             <li class="nav-item" role="presentation">

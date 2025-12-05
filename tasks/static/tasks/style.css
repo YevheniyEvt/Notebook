@@ -1,0 +1,39 @@
+.custom-tabs {
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-tabs .nav-link {
+    color: #495057;
+    border: none;
+    padding: 15px 25px;
+    transition: all 0.3s ease;
+}
+
+.custom-tabs .nav-link.active {
+    color: #fff;
+    background-color: #007bff;
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+}
+
+.custom-tabs .tab-content {
+    padding: 30px;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
