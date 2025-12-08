@@ -13,6 +13,7 @@ dependencies = [
     "django-htmx>=1.27.0",
     "django-tables2>=2.8.0",
     "django-template-partials>=25.3",
+    "django-tempus-dominus>=5.1.2.17",
     "django-widget-tweaks>=1.5.0",
     "ipython>=9.8.0",
     "mypy>=1.19.0",

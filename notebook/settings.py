@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_htmx",
     "template_partials",
+    "tempus_dominus",
 
     "tasks.apps.TasksConfig",
     "daybook.apps.DaybookConfig",

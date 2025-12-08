@@ -1,5 +1,6 @@
 from datetime import date
 
+from tempus_dominus.widgets import DatePicker
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 from django import forms
@@ -9,12 +10,14 @@ from tasks.models import Task, TaskComment
 
 
 class TaskForm(forms.ModelForm):
-    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'), initial=date.today)
-    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'), initial=date.today)
 
     class Meta:
         model = Task
         fields = ( 'start_date', 'end_date', 'title', 'description',)
+        widgets = {
+            "start_date": DatePicker(),
+            "end_date": DatePicker(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,14 +37,13 @@ class TaskForm(forms.ModelForm):
         )
 
 class TaskCommentForm(forms.ModelForm):
-    comment = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 4}),
-        required=True,
-        max_length=200
-    )
+
     class Meta:
         model = TaskComment
         fields = ( 'comment',)
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
