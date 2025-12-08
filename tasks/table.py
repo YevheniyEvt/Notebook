@@ -9,9 +9,11 @@ class TaskTable(tables.Table):
     end_date = tables.Column(attrs={'td': {"style": "vertical-align: middle;", 'class': 'text-nowrap'}})
     action = tables.TemplateColumn(orderable=False, verbose_name="", template_name="tasks/table/action_field.html", attrs={'td': {"style": "vertical-align: middle;"}})
 
+    # add id to div that wraps table
+    table_container_id = "tasks-table"
+
     class Meta:
         model = Task
-        template_name = "django_tables2/bootstrap.html"
         fields = ('description', 'start_date', 'end_date', 'action')
         attrs = {
             "class": "table table-hover mt-4",
