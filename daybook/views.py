@@ -5,7 +5,7 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from daybook.forms import EntriesUpdateForm, EntriesCreateForm
 from daybook.models import Entries
-from mixins import HTMXViewFormMixin
+from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
 class EntriesListView(ListView):
@@ -54,13 +54,8 @@ class EntriesUpdateView(HTMXViewFormMixin, UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class EntriesDeleteView(DeleteView):
+class EntriesDeleteView(HTMXDeleteViewMixin, DeleteView):
     model = Entries
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-
-    def delete(self, request, *args, **kwargs):
-        self.get_object().delete()
-        response = HttpResponse()
-        return response
