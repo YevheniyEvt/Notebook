@@ -5,7 +5,7 @@ from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 from django_tables2 import SingleTableView
 
-from mixins import HTMXViewFormMixin
+from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 from tasks.filter import TaskFilter
 from tasks.forms import TaskForm
 from tasks.models import Task
@@ -70,20 +70,13 @@ class TaskUpdateView(HTMXViewFormMixin, UpdateView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class TaskDeleteView(DeleteView):
+class TaskDeleteView(HTMXDeleteViewMixin, DeleteView):
     model = Task
     http_method_names = ['delete']
-    success_url = reverse_lazy('tasks:task_list')
+    htmx_client_events = ['rerenderTaskTable',]
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-
-    def delete(self, request, *args, **kwargs):
-        self.get_object().delete()
-        response = HttpResponse()
-        trigger_client_event(response, 'rerenderTaskTable')
-        return response
-
 
 class SetTaskStatusView(UpdateView):
     model = Task

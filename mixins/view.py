@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -6,6 +8,7 @@ from django_htmx.http import trigger_client_event
 
 __all__ = [
     'HTMXViewFormMixin',
+    'HTMXDeleteViewMixin',
 ]
 
 class HTMXViewFormMixin:
@@ -33,7 +36,7 @@ class HTMXViewFormMixin:
     """
 
     redirect_url: str = reverse_lazy('index')
-    htmx_client_events: list[str] = []
+    htmx_client_events: Sequence[str] = []
 
     def dispatch(self, request, *args, **kwargs):
         if not request.htmx:
@@ -42,6 +45,33 @@ class HTMXViewFormMixin:
 
     def form_valid(self, form):
         form.save()
+        response = HttpResponse()
+        for client_event in self.htmx_client_events:
+            trigger_client_event(response, client_event)
+        return response
+
+
+class HTMXDeleteViewMixin:
+    """
+    A mixin for Django class-based views that are intended to be accessed exclusively
+    via HTMX requests.
+
+    Features:
+        - Provides a list of HTMX client-side events to trigger after deletion
+
+    Attributes:
+        htmx_client_events (list[str]):
+            A list of event names that will be emitted to the HTMX client after
+            `form_valid()` is executed.
+
+    Typical use:
+        - Use this mixin together with Django's DeleteView.
+    """
+    http_method_names = ['delete']
+    htmx_client_events: Sequence[str] = []
+
+    def delete(self, request, *args, **kwargs):
+        self.get_object().delete()
         response = HttpResponse()
         for client_event in self.htmx_client_events:
             trigger_client_event(response, client_event)
