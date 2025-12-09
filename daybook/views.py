@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
@@ -8,7 +9,7 @@ from daybook.models import Entries
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
-class EntriesListView(ListView):
+class EntriesListView(LoginRequiredMixin, ListView):
     model = Entries
     template_name = 'daybook/entries_list.html'
 
@@ -16,7 +17,7 @@ class EntriesListView(ListView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class EntriesDetailView(DetailView):
+class EntriesDetailView(LoginRequiredMixin, DetailView):
     model = Entries
     template_name = 'daybook/entries_list.html#entry'
     context_object_name = 'entry'
@@ -25,7 +26,7 @@ class EntriesDetailView(DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class EntriesCreateView(CreateView):
+class EntriesCreateView(LoginRequiredMixin, CreateView):
     model = Entries
     form_class = EntriesCreateForm
     template_name = 'daybook/partials/create_entries_modal.html'
@@ -39,7 +40,7 @@ class EntriesCreateView(CreateView):
         return HttpResponseClientRefresh()
 
 
-class EntriesUpdateView(HTMXViewFormMixin, UpdateView):
+class EntriesUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Entries
     form_class = EntriesUpdateForm
     template_name = 'daybook/partials/update_enty_form.html'
@@ -54,7 +55,7 @@ class EntriesUpdateView(HTMXViewFormMixin, UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class EntriesDeleteView(HTMXDeleteViewMixin, DeleteView):
+class EntriesDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Entries
 
     def get_queryset(self):

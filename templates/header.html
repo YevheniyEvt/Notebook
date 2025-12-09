@@ -100,6 +100,25 @@
                 Helper
               </a>
             </li>
+            <li>
+              <a class="nav-link text-white"
+                 href="#"
+                 data-bs-toggle="modal"
+                 data-bs-target="#logoutModal"
+                 hx-get="{% url 'account_logout' %}"
+                 hx-target="#logoutModalDialog"
+              >
+                <svg
+                  class="bi d-block mx-auto mb-1"
+                  width="24"
+                  height="24"
+                  aria-hidden="true"
+                >
+                  <use xlink:href="#logout"></use>
+                </svg>
+                Logout
+              </a>
+            </li>
           </ul>
         </div>
       </div>

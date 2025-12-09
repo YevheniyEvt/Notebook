@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login_page.css' %}">
+{% endblock %}
+
+{% block navbar %}
+{% endblock navbar %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Login</h3>
+{#                    <div class="d-grid gap-2 mb-3">#}
+{#                        <a href="#" class="btn btn-social btn-google">#}
+{#                            <i class="bi bi-google me-2"></i> Sign in with Google#}
+{#                        </a>#}
+{#                        <a href="#" class="btn btn-social btn-facebook">#}
+{#                            <i class="bi bi-facebook me-2"></i> Sign in with Facebook#}
+{#                        </a>#}
+{#                        <a href="#" class="btn btn-social btn-twitter">#}
+{#                            <i class="bi bi-twitter me-2"></i> Sign in with Twitter#}
+{#                        </a>#}
+{#                    </div>#}
+{#                    <p class="divider-text">#}
+{#                        <span class="bg-light">OR</span>#}
+{#                    </p>#}
+                    <form action="{% url 'account_login' %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_login" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="id_login" name="login" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" id="id_password" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+{#                    <div class="text-center mt-3">#}
+{#                        <a href="#" class="text-decoration-none">Forgot password?</a>#}
+{#                    </div>#}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -23,6 +23,7 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('', RedirectView.as_view(url=reverse_lazy('tasks:task_list')), name='index'),
     path("admin/", admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path("tasks/", include("tasks.urls", namespace="tasks")),
     path("daybook/", include("daybook.urls", namespace="daybook")),
 ]

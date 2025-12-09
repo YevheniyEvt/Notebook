@@ -1,5 +1,5 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
@@ -21,7 +21,7 @@ __all__ = [
     'SetTaskStatusView',
 ]
 
-class TaskListView(FilterView, SingleTableView):
+class TaskListView(LoginRequiredMixin, FilterView, SingleTableView):
     model = Task
     table_class = TaskTable
     filterset_class = TaskFilter
@@ -37,7 +37,7 @@ class TaskListView(FilterView, SingleTableView):
         return self.template_name
 
 
-class TaskDetailView(DeleteView):
+class TaskDetailView(LoginRequiredMixin, DeleteView):
     model = Task
     template_name = 'tasks/partials/detail_task_modal.html'
     context_object_name = 'task'
@@ -46,7 +46,7 @@ class TaskDetailView(DeleteView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class TaskCreateView(HTMXViewFormMixin, CreateView):
+class TaskCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Task
     template_name = 'tasks/partials/create_task_modal.html'
     form_class = TaskForm
@@ -60,7 +60,7 @@ class TaskCreateView(HTMXViewFormMixin, CreateView):
         return super().form_valid(form)
 
 
-class TaskUpdateView(HTMXViewFormMixin, UpdateView):
+class TaskUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'tasks/partials/create_task_modal.html'
@@ -70,7 +70,7 @@ class TaskUpdateView(HTMXViewFormMixin, UpdateView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class TaskDeleteView(HTMXDeleteViewMixin, DeleteView):
+class TaskDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Task
     http_method_names = ['delete']
     htmx_client_events = ['rerenderTaskTable',]
@@ -78,7 +78,7 @@ class TaskDeleteView(HTMXDeleteViewMixin, DeleteView):
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
-class SetTaskStatusView(UpdateView):
+class SetTaskStatusView(LoginRequiredMixin, UpdateView):
     model = Task
     http_method_names = ['post']
     new_status = None
