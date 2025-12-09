@@ -53,8 +53,9 @@ class Message {
         const types = {
             success: 'bg-success bg-opacity-25 border-success border-opacity-75 rounded-2',
             warning: 'bg-warning bg-opacity-25 border-warning border-opacity-75 rounded-2',
-            fail: 'bg-danger bg-opacity-25 border-danger border-opacity-75 rounded-2',
-            info: 'bg-info bg-opacity-25 border-info border-opacity-75 rounded-2'
+            danger: 'bg-danger bg-opacity-25 border-danger border-opacity-75 rounded-2',
+            info: 'bg-info bg-opacity-25 border-info border-opacity-75 rounded-2',
+            debug: 'bg-secondary bg-opacity-25 border-info border-opacity-75 rounded-2',
         };
 
         this.toastBody.innerHTML = message;
@@ -75,8 +76,9 @@ class Message {
         const icons = {
             success: ['fa-check', 'text-success'],
             warning: ['fa-circle-exclamation', 'text-warning'],
-            fail: ['fa-xmark', 'text-danger'],
-            info: ['fa-circle-info', 'text-info']
+            danger: ['fa-xmark', 'text-danger'],
+            info: ['fa-circle-info', 'text-info'],
+            debug: ['fa-circle-info', 'text-secondary'],
         };
         const [iconClass, color] = icons[type] || icons.success;
         const icon = `<i class="fa-solid ${iconClass} me-2 ${color}" style="
@@ -91,7 +93,8 @@ class Message {
             'text-success': '#198754',
             'text-warning': '#FFC107',
             'text-danger': '#DC3545',
-            'text-info': '#0DCAF0'
+            'text-info': '#0DCAF0',
+            'text-secondary': '#91a0a1',
         };
         return colorMap[colorClass] || '#000';
     }
@@ -110,7 +113,7 @@ class Message {
     }
 }
 
-document.body.addEventListener('flash', (e) => {
+document.body.addEventListener('sendMessages', (e) => {
     const imessage = new Message('imessage');
     imessage.show(e.detail.message, e.detail.tag, "top-right");
 });

@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -37,6 +38,7 @@ class EntriesCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.save()
+        messages.success(self.request, 'Entries was created.')
         return HttpResponseClientRefresh()
 
 
@@ -52,6 +54,7 @@ class EntriesUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         entry = self.get_object()
         self.htmx_client_events.append(f'rerenderEntry{entry.id}')
+        messages.success(self.request, 'Entries was updated.')
         return super().post(request, *args, **kwargs)
 
 
@@ -60,3 +63,7 @@ class EntriesDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Entries was deleted.')
+        return super().delete(request, *args, **kwargs)

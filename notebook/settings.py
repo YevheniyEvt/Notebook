@@ -67,6 +67,8 @@ MIDDLEWARE = [
 
     "django_htmx.middleware.HtmxMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+
+    'notebook.middleware.htmx_messages.HTMXMessagesMiddleware',
 ]
 
 ROOT_URLCONF = "notebook.urls"
@@ -162,9 +164,17 @@ LOGIN_REDIRECT_URL = reverse_lazy("index")
 LOGOUT_REDIRECT_URL = reverse_lazy("account_login")
 
 MESSAGE_TAGS = {
-    messages.DEBUG: "alert-secondary",
-    messages.INFO: "alert-info",
-    messages.SUCCESS: "alert-success",
-    messages.WARNING: "alert-warning",
-    messages.ERROR: "alert-danger",
+    messages.DEBUG: "info",
+    messages.INFO: "info",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
 }
+
+# MESSAGE_TAGS = {
+#     messages.DEBUG: "alert-secondary",
+#     messages.INFO: "alert-info",
+#     messages.SUCCESS: "alert-success",
+#     messages.WARNING: "alert-warning",
+#     messages.ERROR: "alert-danger",
+# }

@@ -12,9 +12,9 @@ from django.urls import reverse
 
 class Task(models.Model):
     class Status(models.TextChoices):
-        COMPLETED = 'completed'
-        IN_PROGRESS = 'in_progress'
-        CANCELED = 'canceled'
+        COMPLETED = 'completed', 'Completed'
+        IN_PROGRESS = 'in_progress', 'Active'
+        CANCELED = 'canceled', 'Canceled'
 
     title = models.CharField(max_length=100)
     description = models.TextField()

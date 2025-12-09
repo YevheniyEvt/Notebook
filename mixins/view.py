@@ -3,7 +3,7 @@ from typing import Sequence
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import RedirectView
+
 from django_htmx.http import trigger_client_event
 
 __all__ = [
@@ -20,6 +20,7 @@ class HTMXViewFormMixin:
         - Redirects all non-HTMX requests to `redirect_url`.
         - Provides a list of HTMX client-side events to trigger after a successful
           form submission.
+        - Provides a send message events for creating toast.
         - Simplifies creation of HTMX-only form views.
 
     Attributes:

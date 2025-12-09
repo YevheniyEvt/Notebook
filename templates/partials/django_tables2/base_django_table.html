@@ -1,7 +1,7 @@
 {% extends 'django_tables2/bootstrap5.html' %}
 
 {% block table-wrapper %}
-<div class="table-container table-responsive" {% if table.table_container_id %} id="{{ table.table_container_id }}" {% endif %}>
+<div class="table-container table-responsive bg-light" {% if table.table_container_id %} id="{{ table.table_container_id }}" {% endif %}>
     {% block table %}
         {{ block.super }}
     {% endblock table %}

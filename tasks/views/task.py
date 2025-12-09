@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django.contrib import messages
+
 from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 from django_tables2 import SingleTableView
@@ -57,6 +59,7 @@ class TaskCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        messages.success(self.request, 'Task created.')
         return super().form_valid(form)
 
 
@@ -69,6 +72,9 @@ class TaskUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Task updated.')
+        return super().form_valid(form)
 
 class TaskDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Task
@@ -77,6 +83,10 @@ class TaskDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Task was deleted.')
+        return super().delete(request, *args, **kwargs)
 
 class SetTaskStatusView(LoginRequiredMixin, UpdateView):
     model = Task
@@ -99,6 +109,7 @@ class SetTaskStatusView(LoginRequiredMixin, UpdateView):
         response = HttpResponse()
         trigger_client_event(response, 'rerenderTaskTable')
         trigger_client_event(response, 'closeModal')
+        messages.success(self.request, f'Task status was updated to {task.status.label.lower()}.')
         return response
 
     def set_task_status(self, task):
