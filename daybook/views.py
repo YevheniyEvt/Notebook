@@ -1,9 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
-from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
-from django_htmx.http import HttpResponseClientRefresh
 
 from daybook.forms import EntriesUpdateForm, EntriesCreateForm
 from daybook.models import Entries
@@ -17,6 +14,11 @@ class EntriesListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return self.template_name + '#entries-list'
+        return self.template_name
+
 
 class EntriesDetailView(LoginRequiredMixin, DetailView):
     model = Entries
@@ -27,19 +29,19 @@ class EntriesDetailView(LoginRequiredMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class EntriesCreateView(LoginRequiredMixin, CreateView):
+class EntriesCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Entries
     form_class = EntriesCreateForm
     template_name = 'daybook/partials/create_entries_modal.html'
+    htmx_client_events = ['renderEntriesList', 'closeModal']
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        form.save()
         messages.success(self.request, 'Entries was created.')
-        return HttpResponseClientRefresh()
+        return super().form_valid(form)
 
 
 class EntriesUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):

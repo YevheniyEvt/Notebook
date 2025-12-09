@@ -23,50 +23,56 @@
 {% endblock header %}
 
 {% block content %}
-<div>
-{% for entry in entries_list %}
-    {% partialdef entry inline %}
-    <article class="mt-4"
-             id="entry-article-{{ entry.id }}"
-             hx-get="{% url 'daybook:entries_detail' entry.id %}"
-             hx-trigger="rerenderEntry{{ entry.id }} from:body"
-             hx-swap="outerHTML"
+{% partialdef entries-list inline %}
+    <div id="entries-list"
+         hx-get="{{ request.path }}"
+         hx-trigger="renderEntriesList from:body"
+         hx-swap="outerHTML"
     >
-        <h2 class="mb-1">
-            {% if entry.title %}
-                {{ entry.title }}
-            {% endif %}
-        </h2>
-        <div class="d-flex gap-2">
-           <p class="blog-post-meta d-flex" >
-              {{ entry.created_at }}
-            </p>
-            <a href="#"
-               hx-get="{% url 'daybook:entries_update' entry.id %}"
-               hx-swap="innerHTML"
-               hx-target="#entry-text-{{ entry.id }}"
-            >
-              <i class="bi bi-pencil text-primary"></i>
-            </a>
-            <a href="#"
-               hx-delete="{% url 'daybook:entries_delete' entry.id %}"
-               hx-target="closest article"
-               hx-swap='delete'
-               hx-confirm="Delete entry?"
-            >
-                <i class="bi bi-trash text-danger"></i>
-            </a>
-        </div>
-        <div id="entry-text-{{ entry.id }}">
-            <p>
-              {{ entry.text|linebreaksbr }}
-            </p>
-        </div>
-        <hr />
-    </article>
-    {% endpartialdef entry %}
-{% endfor %}
-</div>
+    {% for entry in entries_list %}
+        {% partialdef entry inline %}
+        <article class="mt-4"
+                 id="entry-article-{{ entry.id }}"
+                 hx-get="{% url 'daybook:entries_detail' entry.id %}"
+                 hx-trigger="rerenderEntry{{ entry.id }} from:body"
+                 hx-swap="outerHTML"
+        >
+            <h2 class="mb-1">
+                {% if entry.title %}
+                    {{ entry.title }}
+                {% endif %}
+            </h2>
+            <div class="d-flex gap-2">
+               <p class="blog-post-meta d-flex" >
+                  {{ entry.created_at }}
+                </p>
+                <a href="#"
+                   hx-get="{% url 'daybook:entries_update' entry.id %}"
+                   hx-swap="innerHTML"
+                   hx-target="#entry-text-{{ entry.id }}"
+                >
+                  <i class="bi bi-pencil text-primary"></i>
+                </a>
+                <a href="#"
+                   hx-delete="{% url 'daybook:entries_delete' entry.id %}"
+                   hx-target="closest article"
+                   hx-swap='delete'
+                   hx-confirm="Delete entry?"
+                >
+                    <i class="bi bi-trash text-danger"></i>
+                </a>
+            </div>
+            <div id="entry-text-{{ entry.id }}">
+                <p>
+                  {{ entry.text|linebreaksbr }}
+                </p>
+            </div>
+            <hr />
+        </article>
+        {% endpartialdef entry %}
+    {% endfor %}
+    </div>
+{% endpartialdef entries-list %}
 
 <!-- Modals -->
 <div class="modal fade" id="createEntriesModal" tabindex="-1" aria-labelledby="createEntriesModalLabel" aria-hidden="true"
