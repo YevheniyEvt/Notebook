@@ -51,9 +51,11 @@ INSTALLED_APPS = [
     "tempus_dominus",
     'allauth',
     'allauth.account',
+    'cloudinary',
 
     "tasks.apps.TasksConfig",
     "daybook.apps.DaybookConfig",
+    "notes.apps.NotesConfig",
 ]
 
 MIDDLEWARE = [
@@ -178,3 +180,6 @@ MESSAGE_TAGS = {
 #     messages.WARNING: "alert-warning",
 #     messages.ERROR: "alert-danger",
 # }
+
+# cloudinary.config(cloudinary_url=config('CLOUDINARY_URL'))
+CLOUDINARY_URL = config('CLOUDINARY_URL')
