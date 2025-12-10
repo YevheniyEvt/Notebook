@@ -1,15 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
+from django_filters.views import FilterView
 
+from daybook.filter import EntriesFilter
 from daybook.forms import EntriesUpdateForm, EntriesCreateForm
 from daybook.models import Entries
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
-class EntriesListView(LoginRequiredMixin, ListView):
+class EntriesListView(LoginRequiredMixin, FilterView, ListView):
     model = Entries
     template_name = 'daybook/entries_list.html'
+    filterset_class = EntriesFilter
+    paginate_by = 5
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
