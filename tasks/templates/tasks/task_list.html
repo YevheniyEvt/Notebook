@@ -26,93 +26,117 @@
 {% endblock header %}
 
 {% block content %}
-<div class="container">
-    <div class="custom-tabs">
-        <ul class="nav nav-tabs" id="tasks" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active"
-                        id="active-tasks-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#active-tasks"
-                        type="button"
-                        role="tab"
-                        aria-controls="active-tasks"
-                        aria-selected="true"
-                        hx-trigger="load, click, rerenderTaskTable from:body"
-                        hx-get="{% url 'tasks:task_list' %}?status=in_progress"
-                        hx-target="#active-tasks"
-                        hx-select=".table-container"
-                >
-                    Active
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link"
-                        id="completed-tasks-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#completed-tasks"
-                        type="button" role="tab"
-                        aria-controls="completed-tasks"
-                        aria-selected="false"
-                        hx-trigger="click, rerenderTaskTable from:body"
-                        hx-get="{% url 'tasks:task_list' %}?status=completed"
-                        hx-target="#completed-tasks"
-                        hx-select=".table-container"
-                >
-                    Completed
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link"
-                        id="canceled-tasks-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#canceled-tasks"
-                        type="button" role="tab"
-                        aria-controls="canceled-tasks"
-                        aria-selected="false"
-                        hx-trigger="click, rerenderTaskTable from:body"
-                        hx-get="{% url 'tasks:task_list' %}?status=canceled"
-                        hx-target="#canceled-tasks"
-                        hx-select=".table-container"
-                >
-                    Canceled
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link"
-                        id="all-tasks-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#all-tasks"
-                        type="button" role="tab"
-                        aria-controls="all-tasks"
-                        aria-selected="false"
-                        hx-trigger="click, rerenderTaskTable from:body"
-                        hx-get="{% url 'tasks:task_list' %}"
-                        hx-target="#all-tasks"
-                        hx-select=".table-container"
+<div id="tasks-root"  x-data="{active_tab: 'in_progress', task_status:'in_progress'}">
+    <div class="px-3 py-2 border-bottom mb-3">
+      <div class="container">
+        <form
+          class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
+          role="search"
+          hx-trigger="search, keyup delay:200ms changed"
+          :hx-target="`#${active_tab}`"
+          hx-get="{% url 'tasks:task_list' %}"
+          hx-include="[name=search], [name=status]"
+        >
+          <input
+            type="search"
+            name="search"
+            class="form-control"
+            placeholder="Search..."
+            aria-label="Search"
+          />
+            <input type="hidden" name="status" :value="task_status">
+        </form>
+      </div>
+    </div>
+    <div class="container">
+        <div class="custom-tabs">
+            <ul class="nav nav-tabs" id="tasks" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active"
+                            id="in_progress-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#in_progress"
+                            type="button" role="tab"
+                            aria-controls="in_progress"
+                            aria-selected="true"
+                            hx-trigger="load once, click, rerenderTaskTable from:body"
+                            hx-get="{% url 'tasks:task_list' %}?status=in_progress"
+                            hx-target="#in_progress"
+                            hx-select=".table-container"
+                            x-on:click="active_tab='in_progress'; task_status='in_progress'"
+                    >
+                        Active
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link"
+                            id="completed-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#completed"
+                            type="button" role="tab"
+                            aria-controls="completed"
+                            aria-selected="false"
+                            hx-trigger="click, rerenderTaskTable from:body"
+                            hx-get="{% url 'tasks:task_list' %}?status=completed"
+                            hx-target="#completed"
+                            hx-select=".table-container"
+                            x-on:click="active_tab='completed'; task_status='completed'"
+                    >
+                        Completed
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link"
+                            id="canceled-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#canceled"
+                            type="button" role="tab"
+                            aria-controls="canceled"
+                            aria-selected="false"
+                            hx-trigger="click, rerenderTaskTable from:body"
+                            hx-get="{% url 'tasks:task_list' %}?status=canceled"
+                            hx-target="#canceled"
+                            hx-select=".table-container"
+                            x-on:click="active_tab='canceled'; task_status='canceled'"
+                    >
+                        Canceled
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link"
+                            id="all-tasks-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#all-tasks"
+                            type="button" role="tab"
+                            aria-controls="all-tasks"
+                            aria-selected="false"
+                            hx-trigger="click, rerenderTaskTable from:body"
+                            hx-get="{% url 'tasks:task_list' %}"
+                            hx-target="#all-tasks"
+                            hx-select=".table-container"
+                            x-on:click="active_tab='all-tasks'; task_status=''"
+                    >
+                        All
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content" id="tasksContent">
+                <div class="tab-pane fade show active" id="in_progress" role="tabpanel" aria-labelledby="in_progress-tab">
+                    <!-- HTMX will inject content here -->
+                </div>
+                <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+                    <!-- HTMX will inject content here -->
+                </div>
+                <div class="tab-pane fade" id="canceled" role="tabpanel" aria-labelledby="canceled-tab">
+                    <!-- HTMX will inject content here -->
+                </div>
+                <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="all-tasks-tab">
 
-                >
-                    All
-                </button>
-            </li>
-        </ul>
-        <div class="tab-content" id="tasksContent">
-            <div class="tab-pane fade show active" id="active-tasks" role="tabpanel" aria-labelledby="active-tasks-tab">
-                <!-- HTMX will inject content here -->
-            </div>
-            <div class="tab-pane fade" id="completed-tasks" role="tabpanel" aria-labelledby="profile-tab">
-                <!-- HTMX will inject content here -->
-            </div>
-            <div class="tab-pane fade" id="canceled-tasks" role="tabpanel" aria-labelledby="contact-tab">
-                <!-- HTMX will inject content here -->
-            </div>
-            <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="contact-tab">
-
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Partials -->
 {% partialdef django_table %}
     {% render_table table %}
@@ -134,6 +158,7 @@
     <!-- HTMX will inject content here -->
   </div>
 </div>
+
 {% endblock content %}
 
 {% block js %}
