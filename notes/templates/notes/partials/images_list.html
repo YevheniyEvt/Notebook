@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+
+{% if images %}
+    {% for image in images %}
+     <p >{{image.image_title}}</p>
+      <a href="{{image.get_image_url}}" target="_blank">
+        <img src="{{image.get_thumbnail_url}}" alt="">
+      </a>
+    {% endfor %}
+{% else %}
+    <h3>No images</h3>
+{% endif %}
+
+

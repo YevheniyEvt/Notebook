@@ -26,4 +26,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path("tasks/", include("tasks.urls", namespace="tasks")),
     path("daybook/", include("daybook.urls", namespace="daybook")),
+    path("notes/", include("notes.urls", namespace="notes")),
 ]

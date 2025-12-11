@@ -14,15 +14,15 @@
           <span class="visually-hidden">Home</span>
         </a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'notes:topic_list' %}">Topics</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{ topic.title }}</li>
+      <li class="breadcrumb-item active" aria-current="page">Topics</li>
     </ol>
   </nav>
 </div>
 {% endblock header %}
 
 {% block content %}
-{% for section in topic.sections.all %}
-    <a href="{{ section.get_absolute_url }}">{{ section.title }}</a>
+{% for topic in topics %}
+    <a href="{{ topic.get_absolute_url }}">{{ topic.title }}</a>
+
 {% endfor %}
 {% endblock content %}

@@ -1,10 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block header %}
+<div class="container my-3">
+  <nav aria-label="breadcrumb">
+    <ol
+      class="breadcrumb breadcrumb-chevron p-3 rounded-3"
+    >
+      <li class="breadcrumb-item">
+        <a class="link-body-emphasis" href="{% url 'index' %}">
+          <svg class="bi" width="16" height="16" aria-hidden="true">
+            <use xlink:href="#house-door-fill"></use>
+          </svg>
+          <span class="visually-hidden">Home</span>
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'notes:topic_list' %}">Topics</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{{ section.topic.get_absolute_url }}">{{ section.topic.title }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ section.title }}</li>
+    </ol>
+  </nav>
+</div>
+
+{% endblock header %}
+{% block content %}
+    <h1>{{ section.title }}</h1>
+    <div class="d-flex justify-content-between">
+        <h2>
+            <a href="#"
+               hx-get="{% url 'notes:code_list' section.id %}"
+               hx-target="#section-content"
+        >
+            Codes
+        </a>
+        </h2>
+        <h2>
+            <a href="#"
+               hx-get="{% url 'notes:article_list' section.id %}"
+               hx-target="#section-content"
+        >
+            Articles
+        </a>
+        </h2>
+        <h2>
+            <a href="#"
+               hx-get="{% url 'notes:link_list' section.id %}"
+               hx-target="#section-content"
+        >
+            Links
+        </a>
+        </h2>
+            <h2>
+            <a href="#"
+               hx-get="{% url 'notes:image_list' section.id %}"
+               hx-target="#section-content"
+        >
+            Images
+        </a>
+        </h2>
+
+    </div>
+
+
+    <div id="section-content">
+        <!-- HTMX will inject content here -->
+    </div>
+
+{% endblock content %}

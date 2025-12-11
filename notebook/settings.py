@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+
+import cloudinary
 from decouple import config
 from django.urls import reverse, reverse_lazy
 from django.contrib.messages import constants as messages
@@ -181,5 +183,9 @@ MESSAGE_TAGS = {
 #     messages.ERROR: "alert-danger",
 # }
 
-# cloudinary.config(cloudinary_url=config('CLOUDINARY_URL'))
-CLOUDINARY_URL = config('CLOUDINARY_URL')
+cloudinary.config(
+    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
+    secure=True
+)

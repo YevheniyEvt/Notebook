@@ -1,4 +1,9 @@
 
-{% for code in codes %}
-    {{ code.content }}
-{% endfor %}
+{% if codes %}
+    {% for code in codes %}
+        <p>{{ code.content|linebreaksbr }}</p>
+        <hr>
+    {% endfor %}
+{% else %}
+    <h3>No codes</h3>
+{% endif %}
