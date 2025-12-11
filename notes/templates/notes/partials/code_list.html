@@ -1,5 +1,5 @@
 <style>
-    pre {
+pre {
     background-color: #f8f9fa;
     border: 1px solid #7020c6;
     border-radius: 0.25rem;
@@ -17,8 +17,8 @@
 {% if codes %}
 <div class="container ">
     {% for code in codes %}
-    <div class="position-relative" >
-        <pre><code id="codeBlock-{{ code.id }}">{{ code.content|linebreaksbr }}</code></pre>
+    <div class="position-relative">
+        <pre><code class="mt-2" id="codeBlock-{{ code.id }}">{{ code.content }}</code></pre>
         <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyCode({{ code.id }}, this)">
             <i class="bi bi-clipboard"></i> Copy
         </button>
