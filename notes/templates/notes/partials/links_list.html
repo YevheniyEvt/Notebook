@@ -1,9 +1,11 @@
-
 {% if links %}
+<div class="container ">
     {% for link in links %}
-        <a href="{{ link.url }}" target="_blank">{% if link.title %}{{ link.title }}{% else %}{{ link.url }}{% endif %}</a>
-        <hr>
+    <div class="position-relative" >
+        <pre><a href="{{ link.url }}" target="_blank">{% if link.title %}{{ link.title }}{% else %}{{ link.url }}{% endif %}</a></pre>
+    </div>
     {% endfor %}
+</div>
 {% else %}
     <h3>No links</h3>
 {% endif %}

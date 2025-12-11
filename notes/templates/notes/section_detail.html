@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'notes/style.css' %}">
+{% endblock css %}
 
 {% block header %}
 <div class="container my-3">
@@ -23,46 +28,106 @@
 
 {% endblock header %}
 {% block content %}
-    <h1>{{ section.title }}</h1>
-    <div class="d-flex justify-content-between">
-        <h2>
-            <a href="#"
-               hx-get="{% url 'notes:code_list' section.id %}"
-               hx-target="#section-content"
+
+<div class="container">
+    <div class="col-12 text-center mb-3">
+        <span class="custom-badge text-white mb-3 d-inline-block">{{ section.title }}</span>
+        {% if section.description %}<p class="text-muted">{{ section.description }}</p>{% endif %}
+    </div>
+    <div class="custom-tabs">
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs row g-4 row-cols-1 row-cols-lg-4" id="sectionTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active"
+                id="codes-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#codes"
+                type="button"
+                role="tab"
+                aria-controls="codes"
+                aria-selected="true"
+                hx-trigger="load, click"
+                hx-get="{% url 'notes:code_list' section.id %}"
+                hx-target="#codes"
+                hx-swap="innerHTML"
         >
             Codes
-        </a>
-        </h2>
-        <h2>
-            <a href="#"
-               hx-get="{% url 'notes:article_list' section.id %}"
-               hx-target="#section-content"
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="articles-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#articles"
+                type="button"
+                role="tab"
+                aria-controls="articles"
+                aria-selected="false"
+                hx-get="{% url 'notes:article_list' section.id %}"
+                hx-target="#articles"
+                hx-swap="innerHTML"
         >
             Articles
-        </a>
-        </h2>
-        <h2>
-            <a href="#"
-               hx-get="{% url 'notes:link_list' section.id %}"
-               hx-target="#section-content"
-        >
-            Links
-        </a>
-        </h2>
-            <h2>
-            <a href="#"
-               hx-get="{% url 'notes:image_list' section.id %}"
-               hx-target="#section-content"
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="images-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#images"
+                type="button"
+                role="tab"
+                aria-controls="images"
+                aria-selected="false"
+                hx-get="{% url 'notes:image_list' section.id %}"
+                hx-target="#images"
+                hx-swap="innerHTML"
         >
             Images
-        </a>
-        </h2>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="links-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#links"
+                type="button"
+                role="tab"
+                aria-controls="links"
+                aria-selected="false"
+                hx-get="{% url 'notes:link_list' section.id %}"
+                hx-target="#links"
+                hx-swap="innerHTML"
+        >
+            Links
+        </button>
+      </li>
+    </ul>
 
-    </div>
+    <!-- Tab Content -->
+    <div class="tab-content p-4" id="sectionTabContent">
 
-
-    <div id="section-content">
+      <!-- Codes tab -->
+      <div class="tab-pane fade show active" id="codes" role="tabpanel" aria-labelledby="codes-tab">
         <!-- HTMX will inject content here -->
-    </div>
+      </div>
 
+      <!-- Articles tab -->
+      <div class="tab-pane fade" id="articles" role="tabpanel" aria-labelledby="articles-tab">
+        <!-- HTMX will inject content here -->
+      </div>
+
+      <!-- Images tab -->
+      <div class="tab-pane fade show active" id="images" role="tabpanel" aria-labelledby="images-tab">
+        <!-- HTMX will inject content here -->
+      </div>
+
+      <!-- Links tab -->
+      <div class="tab-pane fade" id="links" role="tabpanel" aria-labelledby="links-tab">
+        <!-- HTMX will inject content here -->
+      </div>
+
+    </div>
+    </div>
+</div>
 {% endblock content %}

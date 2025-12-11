@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'notes/style.css' %}">
+{% endblock css %}
 
 {% block header %}
 <div class="container my-3">
@@ -21,8 +26,32 @@
 {% endblock header %}
 
 {% block content %}
-{% for topic in topics %}
-    <a href="{{ topic.get_absolute_url }}">{{ topic.title }}</a>
-
-{% endfor %}
+<div class="container">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="#" style="text-decoration: none">
+                <div class="service-card h-100 p-4">
+                    <div class="icon-wrapper mb-4">
+                        <i class="bi bi-plus-circle" style="font-size: 2rem; color: green;"></i>
+                    </div>
+                    <h4 class="service-title text-center mb-3 text-success">Add</h4>
+                    <p class="service-text text-center mb-0 text-success">Create new topic</p>
+                </div>
+            </a>
+        </div>
+        {% for topic in topics %}
+        <div class="col-md-4">
+            <a href="{{ topic.get_absolute_url }}" style="text-decoration: none">
+                <div class="service-card h-100 p-4">
+                    <div class="icon-wrapper mb-4">
+                        <i class="bi bi-{{ topic.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                    </div>
+                    <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
+                    {% if topic.description  %}<p class="service-text text-center mb-0">{{ topic.description }}</p>{% endif %}
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}

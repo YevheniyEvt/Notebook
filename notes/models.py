@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
@@ -7,7 +9,7 @@ from django.utils.text import slugify
 from cloudinary.models import CloudinaryField
 
 
-# Create your models here.
+DEFAULT_BOOTSTRAP_ICON_NAME = ['calendar2', 'clipboard', 'cpu', 'database', 'file-richtext-fill', 'floppy']
 
 def get_display_name(instance):
     return instance.get_display_name()
@@ -17,6 +19,8 @@ def get_public_id_prefix(instance):
     model_name = instance.__class__.__name__
     return f"{model_name}/{instance.get_display_name()}/"
 
+def get_random_icon():
+    return random.choice(DEFAULT_BOOTSTRAP_ICON_NAME)
 
 class Topic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -25,6 +29,7 @@ class Topic(models.Model):
         validators=[MinLengthValidator(2, 'Must be more then 2 characters')],
     )
     description = models.TextField(max_length=200, blank=True, null=True)
+    bootstrap_icon_name=models.CharField(blank=True, null=True, max_length=100, default=get_random_icon)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -39,6 +44,7 @@ class Section(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='sections')
     title = models.CharField(max_length=150)
     description = models.TextField(max_length=200, blank=True, null=True)
+    bootstrap_icon_name = models.CharField(blank=True, null=True, max_length=100, default=get_random_icon)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

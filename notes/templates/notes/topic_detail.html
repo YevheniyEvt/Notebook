@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'notes/style.css' %}">
+{% endblock css %}
 
 {% block header %}
 <div class="container my-3">
@@ -22,7 +27,39 @@
 {% endblock header %}
 
 {% block content %}
-{% for section in topic.sections.all %}
-    <a href="{{ section.get_absolute_url }}">{{ section.title }}</a>
-{% endfor %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 text-center mb-3">
+            <span class="custom-badge text-white mb-3 d-inline-block">{{ topic.title }}</span>
+            {% if topic.description %}<p class="text-muted">{{ topic.description }}</p>{% endif %}
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="#" style="text-decoration: none">
+                <div class="service-card h-100 p-4">
+                    <div class="icon-wrapper mb-4">
+                        <i class="bi bi-plus-circle" style="font-size: 2rem; color: green;"></i>
+                    </div>
+                    <h4 class="service-title text-center mb-3 text-success">Add</h4>
+                    <p class="service-text text-center mb-0 text-success">Create new section</p>
+                </div>
+            </a>
+        </div>
+        {% for section in topic.sections.all %}
+        <div class="col-md-4">
+            <a href="{{ section.get_absolute_url }}" style="text-decoration: none">
+                <div class="service-card h-100 p-4">
+                    <div class="icon-wrapper mb-4">
+                        <i class="bi bi-{{ section.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                    </div>
+                    <h4 class="service-title text-center mb-3">{{ section.title }}</h4>
+                    {% if section.description  %}<p class="service-text text-center mb-0">{{ section.description }}</p>{% endif %}
+                </div>
+            </a>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}

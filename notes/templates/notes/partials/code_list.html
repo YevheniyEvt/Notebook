@@ -1,9 +1,52 @@
+<style>
+    pre {
+    background-color: #f8f9fa;
+    border: 1px solid #7020c6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+</style>
 
 {% if codes %}
+<div class="container ">
     {% for code in codes %}
-        <p>{{ code.content|linebreaksbr }}</p>
-        <hr>
+    <div class="position-relative" >
+        <pre><code id="codeBlock-{{ code.id }}">{{ code.content|linebreaksbr }}</code></pre>
+        <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyCode({{ code.id }}, this)">
+            <i class="bi bi-clipboard"></i> Copy
+        </button>
+    </div>
     {% endfor %}
+</div>
 {% else %}
     <h3>No codes</h3>
 {% endif %}
+
+<script>
+    function copyCode(codeId, btn) {
+            const codeBlock = document.getElementById(`codeBlock-${codeId}`);
+            const textArea = document.createElement('textarea');
+            textArea.value = codeBlock.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+}
+</script>

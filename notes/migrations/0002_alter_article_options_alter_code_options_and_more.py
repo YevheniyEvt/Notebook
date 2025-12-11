@@ -4,6 +4,8 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
+import notes.models
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -111,10 +113,26 @@ class Migration(migrations.Migration):
             name='description',
             field=models.TextField(blank=True, max_length=200, null=True),
         ),
+        migrations.AddField(
+            model_name='topic',
+            name='bootstrap_icon_name',
+            field=models.CharField(blank=True, default=notes.models.get_random_icon, max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name='section',
+            name='bootstrap_icon_name',
+            field=models.CharField(blank=True, default=notes.models.get_random_icon, max_length=100, null=True),
+        ),
         migrations.AlterField(
             model_name='section',
             name='description',
             field=models.TextField(blank=True, max_length=200, null=True),
+        ),
+        migrations.AlterField(
+            model_name='section',
+            name='topic',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sections',
+                                    to='notes.topic'),
         ),
         migrations.DeleteModel(
             name='Note',
