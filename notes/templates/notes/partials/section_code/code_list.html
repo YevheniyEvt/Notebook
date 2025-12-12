@@ -9,25 +9,56 @@ pre {
 
 .copy-btn {
     position: absolute;
-    top: 0.5rem;
+    top: 2rem;
     right: 0.5rem;
 }
 </style>
 
+<div class="container"
+     hx-get="{% url 'notes:code_list' section.id %}"
+     hx-target="this"
+     hx-swap="outerHTML"
+     hx-trigger="rerenderCodeList"
+>
+    <span  class="rounded-circle" type="button"
+        hx-get="{% url 'notes:code_create' section.id %}"
+        hx-target="this"
+        hx-swap="afterend"
+    >
+        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 2rem;"></i>
+    </span>
+
 {% if codes %}
-<div class="container ">
     {% for code in codes %}
-    <div class="position-relative">
+    <div class="position-relative border rounded-3 p-1 mt-3" id="code-{{ code.id }}">
+        <div class="d-flex gap-2">
+            <span
+               hx-get="{% url 'notes:code_update' code.id %}"
+               hx-swap="innerHTML"
+               hx-target="#code-{{ code.id }}"
+            >
+              <i class="bi bi-pencil text-primary"></i>
+            </span>
+            <span
+               hx-delete="{% url 'notes:code_delete' code.id %}"
+               hx-target="#code-{{ code.id }}"
+               hx-swap="delete"
+               hx-confirm="Delete code?"
+            >
+                <i class="bi bi-trash text-danger"></i>
+            </span>
+        </div>
         <pre><code class="mt-2" id="codeBlock-{{ code.id }}">{{ code.content }}</code></pre>
         <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyCode({{ code.id }}, this)">
             <i class="bi bi-clipboard"></i> Copy
         </button>
     </div>
     {% endfor %}
-</div>
 {% else %}
     <h3>No codes</h3>
 {% endif %}
+</div>
+
 
 <script>
     function copyCode(codeId, btn) {

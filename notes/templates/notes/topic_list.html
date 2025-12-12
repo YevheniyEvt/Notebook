@@ -76,7 +76,7 @@
                         </div>
                         <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
                         <p class="service-text text-center mb-0">{% if topic.description  %}{{ topic.description }}{% endif %}</p>
-                        <div class=" position-absolute end-0 bottom-0 mb-2 me-2 d-flex gap-2">
+                        <div class="position-absolute end-0 bottom-0 mb-2 me-2 d-flex gap-2">
                             <span
                                hx-get="{% url 'notes:topic_update' topic.id %}"
                                hx-swap="innerHTML"
@@ -87,7 +87,7 @@
                             <span
                                hx-delete="{% url 'notes:topic_delete' topic.id %}"
                                hx-target="#topic-{{ topic.id }}"
-                               hx-swap='delete'
+                               hx-swap="delete"
                                hx-confirm="Delete topic?"
                             >
                                 <i class="bi bi-trash text-danger"></i>

@@ -19,6 +19,11 @@ urlpatterns = [
 
 
     path("section/<int:pk>/codes/", views.SectionCodeListView.as_view(), name="code_list"),
+    path("section/<int:pk>/code/create/", views.SectionCodeCreateView.as_view(), name="code_create"),
+    path("code/<int:pk>/update/", views.SectionCodeUpdateView.as_view(), name="code_update"),
+    path("code/<int:pk>/delete/", views.SectionCodeDeleteView.as_view(), name="code_delete"),
+
+
     path("section/<int:pk>/articles/", views.SectionArticleListView.as_view(), name="article_list"),
     path("section/<int:pk>/links/", views.SectionLinksListView.as_view(), name="link_list"),
     path("section/<int:pk>/images/", views.SectionImageListView.as_view(), name="image_list"),

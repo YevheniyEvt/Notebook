@@ -1,0 +1,21 @@
+{% load crispy_forms_tags %}
+<div class="border border-primary p-2 mb-3 rounded-3" id="code-update">
+    {% crispy form %}
+    <button class="btn btn-primary btn-sm"
+          hx-post="{% url 'notes:code_update' form.instance.id %}"
+          hx-include="#hx-section-code-form"
+          hx-target="#code-update"
+    >
+      Update
+    </button>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{% url 'notes:code_list'  form.instance.section.id %}"
+            hx-target="#code-{{ form.instance.id  }}"
+            hx-select="#code-{{ form.instance.id  }}"
+            hx-swap="outerHTML"
+    >
+      Cancel
+    </button>
+</div>
+
+
