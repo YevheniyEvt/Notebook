@@ -1,0 +1,21 @@
+{% load crispy_forms_tags %}
+<div  class="border rounded-3 border-primary-subtle p-2 mt-3" id="article-create">
+    {% crispy form %}
+    <button class="btn btn-primary btn-sm"
+          hx-post="{% url 'notes:article_create' section.id %}"
+          hx-include="#hx-section-article-form"
+          hx-target="#article-create"
+    >
+      Create
+    </button>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="#"
+            hx-target="#article-create"
+            hx-swap="delete"
+            hx-trigger="click"
+    >
+      Cancel
+    </button>
+</div>
+
+

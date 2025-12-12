@@ -1,0 +1,40 @@
+{% if articles %}
+<div class="container"
+     hx-get="{% url 'notes:article_list' section.id %}"
+     hx-target="this"
+     hx-swap="outerHTML"
+     hx-trigger="rerenderArticleList"
+>
+    <span  class="rounded-circle" type="button"
+        hx-get="{% url 'notes:article_create' section.id %}"
+        hx-target="this"
+        hx-swap="afterend"
+    >
+        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 2rem;"></i>
+    </span>
+    {% for article in articles %}
+        <div class="border rounded-3 border-primary-subtle p-2 mt-3" id="article-{{ article.id }}">
+            <div class="d-flex gap-2 mb-1">
+                <span
+                   hx-get="{% url 'notes:article_update' article.id %}"
+                   hx-swap="innerHTML"
+                   hx-target="#article-{{ article.id }}"
+                >
+                  <i class="bi bi-pencil text-primary"></i>
+                </span>
+                <span
+                   hx-delete="{% url 'notes:article_delete' article.id %}"
+                   hx-target="#article-{{ article.id }}"
+                   hx-swap="delete"
+                   hx-confirm="Delete article?"
+                >
+                    <i class="bi bi-trash text-danger"></i>
+                </span>
+            </div>
+            {{ article.content|linebreaksbr }}
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+    <h3>No articles</h3>
+{% endif %}
