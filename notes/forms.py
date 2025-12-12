@@ -1,8 +1,9 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div
+from crispy_forms.layout import Layout, Div, Button, Submit
 from django import forms
+from django.urls import reverse
 
-from notes.models import Topic, Section, Code, Article, Links
+from notes.models import Topic, Section, Code, Article, Links, Image
 
 
 class BaseSectionTopicForm(forms.ModelForm):
@@ -81,3 +82,80 @@ class SectionLinksForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_id = 'hx-section-link-form'
+
+
+class SectionImageForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ('title', 'description', 'image_file',)
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 1}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        section_id = kwargs.pop('section_id')
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'hx-section-image-form'
+        self.helper.attrs = {
+            'hx-post':  reverse('notes:image_create', kwargs={'pk': section_id}),
+            'hx-target': '#image-create',
+        }
+
+        self.helper.layout = Layout(
+            'title',
+            'description',
+            'image_file',
+            Submit(
+                value='Add',
+                name='Add',
+                css_class='btn btn-primary btn-sm',
+            ),
+            Button(
+                value='Cancel',
+                name='Cancel',
+                css_class='btn btn-secondary btn-sm',
+                hx_get="#",
+                hx_target="#image-create",
+                hx_swap="delete",
+                hx_trigger="click",
+            )
+        )
+
+class SectionImageUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ('title', 'description', )
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 1}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        section_id = kwargs.pop('section_id')
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'hx-section-image-form'
+        self.helper.attrs = {
+            'hx-post':  reverse('notes:image_update', kwargs={'pk': self.instance.id}),
+            'hx-target': f'#image-{ self.instance.id }',
+        }
+
+        self.helper.layout = Layout(
+            'title',
+            'description',
+            'image_file',
+            Submit(
+                value='Update',
+                name='Update',
+                css_class='btn btn-primary btn-sm',
+            ),
+            Button(
+                value='Cancel',
+                name='Cancel',
+                css_class='btn btn-secondary btn-sm',
+                hx_get = reverse('notes:image_list', kwargs={'pk': section_id}),
+                hx_target = f"#image-{ self.instance.id  }",
+                hx_select = f"#image-{ self.instance.id  }",
+                hx_swap = "outerHTML",
+            )
+        )

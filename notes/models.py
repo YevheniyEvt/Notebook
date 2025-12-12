@@ -1,4 +1,5 @@
 import random
+import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -76,20 +77,19 @@ class Article(models.Model):
 class Image(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    image_title = models.CharField(max_length=150)
-    image_description = models.TextField(blank=True, null=True, default=None)
+    title = models.CharField(max_length=150, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image_file = CloudinaryField('image',
                                  display_name=get_display_name,
                                  public_id_prefix=get_public_id_prefix,
-
                                  )
 
     class Meta:
         ordering = ['-created_at']
 
     def get_display_name(self):
-        return f"Section-{slugify(self.section.title)}-Image-{slugify(self.image_title)}"
+        return f"Section-{slugify(self.section.title)}-Image-{slugify(self.title) if self.title else uuid.uuid4()}"
 
     def get_image_url(self):
         if self.image_file is not None:
@@ -114,7 +114,7 @@ class Links(models.Model):
     title = models.CharField(max_length=150, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     url = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']

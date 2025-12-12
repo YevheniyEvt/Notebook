@@ -1,0 +1,49 @@
+<div class="album py-5 bg-body-tertiary">
+    <div class="container row"
+         hx-get="{% url 'notes:image_list' section.id %}"
+         hx-target="this"
+         hx-swap="outerHTML"
+         hx-trigger="rerenderImageList"
+    >
+        <span class="rounded-circle" type="button"
+            hx-get="{% url 'notes:image_create' section.id %}"
+            hx-target="this"
+            hx-swap="afterend"
+        >
+            <i class="bi bi-plus-circle-fill text-primary" style="font-size: 2rem;"></i>
+        </span>
+        {% if images %}
+        {% for image in images %}
+        <div class="col-sm-6 col-lg-4 mb-2" id="image-{{ image.id }}">
+            <div class="card">
+                <img src="{{image.get_thumbnail_url}}" alt="Image" style="height: 225px; width: 100%">
+                <div class="card-body">
+                    {% if image.title %}<h5 class="card-title">{{image.title}}</h5>{% endif %}
+                    {% if image.description %}<p class="card-text">{{image.description}}</p>{% endif %}
+                    <div class="d-flex justify-content-between">
+                        <p class="card-text"><small class="text-body-secondary">{{image.created_at}}</small></p>
+                        <div>
+                            <span hx-get="{% url 'notes:image_update' image.id %}"
+                                  hx-swap="innerHTML"
+                                  hx-target="#image-{{ image.id }}"
+                            >
+                              <i class="bi bi-pencil text-primary"></i>
+                            </span>
+                            <span hx-delete="{% url 'notes:image_delete' image.id %}"
+                                  hx-target="#image-{{ image.id }}"
+                                  hx-swap="delete"
+                                  hx-confirm="Delete image?"
+                                >
+                                <i class="bi bi-trash text-danger"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+            <h3 class="d-flex justify-content-center">No images</h3>
+        {% endif %}
+    </div>
+</div>

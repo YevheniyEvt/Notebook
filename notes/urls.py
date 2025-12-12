@@ -37,5 +37,8 @@ urlpatterns = [
 
 
     path("section/<int:pk>/images/", views.SectionImageListView.as_view(), name="image_list"),
+    path("section/<int:pk>/image/create/", views.SectionImageCreateView.as_view(), name="image_create"),
+    path("image/<int:pk>/update/", views.SectionImageUpdateView.as_view(), name="image_update"),
+    path("image/<int:pk>/delete/", views.SectionImageDeleteView.as_view(), name="image_delete"),
 
 ]

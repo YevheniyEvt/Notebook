@@ -1,3 +1,4 @@
+import cloudinary
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
@@ -64,5 +65,9 @@ class SectionDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
         return super().get_queryset().filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
+        images = self.get_object().image_set.all()
+        for image in images:
+            public_id = image.image_file.public_id
+            cloudinary.uploader.destroy(public_id, invalidate=True)
         messages.success(self.request, 'Section was deleted.')
         return super().delete(request, *args, **kwargs)
