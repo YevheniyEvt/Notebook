@@ -2,12 +2,12 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 from django import forms
 
-from notes.models import Topic
+from notes.models import Topic, Section
 
 
-class TopicForm(forms.ModelForm):
+class BaseSectionTopicForm(forms.ModelForm):
+    form_id = None
     class Meta:
-        model = Topic
         fields = ('title', 'description', 'bootstrap_icon_name')
         widgets = {
             'description': forms.Textarea(attrs={'rows': 1}),
@@ -16,7 +16,7 @@ class TopicForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'hx-topic-form'
+        self.helper.form_id = self.form_id
         self.helper.form_class = 'blueForms'
         self.helper.form_method = 'post'
         self.helper.form_action = 'submit_survey'
@@ -29,3 +29,17 @@ class TopicForm(forms.ModelForm):
             ),
             'description',
         )
+
+
+class TopicForm(BaseSectionTopicForm):
+    form_id = 'hx-topic-form'
+
+    class Meta(BaseSectionTopicForm.Meta):
+        model = Topic
+
+
+class SectionForm(BaseSectionTopicForm):
+    form_id = 'hx-section-form'
+
+    class Meta(BaseSectionTopicForm.Meta):
+        model = Section

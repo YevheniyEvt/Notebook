@@ -32,10 +32,15 @@ class TopicListView(LoginRequiredMixin, ListView):
 class TopicDetail(LoginRequiredMixin, DetailView):
     model = Topic
     context_object_name = 'topic'
+    template_name = 'notes/topic_detail.html'
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return self.template_name + '#sections'
+        return self.template_name
 
 class TopicCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Topic

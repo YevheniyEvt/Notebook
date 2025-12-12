@@ -1,0 +1,19 @@
+{% load crispy_forms_tags %}
+<div class="service-card h-100 p-4">
+    {% crispy form %}
+    <button class="btn btn-primary btn-sm"
+          hx-post="{% url 'notes:section_update' form.instance.id %}"
+          hx-include="#hx-section-form"
+          hx-target="#create-section"
+    >
+      Update
+    </button>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{% url 'notes:topic_detail' form.instance.topic.id %}"
+            hx-target="#section-{{ form.instance.id}}"
+            hx-select="#section-{{ form.instance.id }}"
+            hx-swap="outerHTML"
+    >
+      Cancel
+    </button>
+</div>

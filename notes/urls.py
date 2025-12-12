@@ -11,7 +11,12 @@ urlpatterns = [
     path("topic/<int:pk>/update/", views.TopicUpdateView.as_view(), name="topic_update"),
     path("topic/<int:pk>/delete/", views.TopicDeleteView.as_view(), name="topic_delete"),
 
+
+    path("topic/<int:pk>/section/create/", views.SectionCreateView.as_view(), name="section_create"),
     path("section/<int:pk>/", views.SectionDetail.as_view(), name="section_detail"),
+    path("section/<int:pk>/update/", views.SectionUpdateView.as_view(), name="section_update"),
+    path("section/<int:pk>/delete/", views.SectionDeleteView.as_view(), name="section_delete"),
+
 
     path("section/<int:pk>/codes/", views.SectionCodeListView.as_view(), name="code_list"),
     path("section/<int:pk>/articles/", views.SectionArticleListView.as_view(), name="article_list"),

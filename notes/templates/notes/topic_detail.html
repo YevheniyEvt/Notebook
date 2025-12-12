@@ -51,32 +51,60 @@
             {% if topic.description %}<p class="text-muted">{{ topic.description }}</p>{% endif %}
         </div>
     </div>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <a href="#" style="text-decoration: none">
-                <div class="service-card h-100 p-4">
-                    <div class="icon-wrapper mb-4">
-                        <i class="bi bi-plus-circle" style="font-size: 2rem; color: green;"></i>
+    <div class="row g-4"
+         hx-get="{% url 'notes:topic_detail' topic.id %}"
+         hx-taget="this"
+         hx-swap="innerHTML"
+         hx-trigger="rerenderSectionList from:body"
+    >
+        {% partialdef sections inline %}
+            <div class="col-md-4"  id="create-section">
+                <a href="#"
+                   style="text-decoration: none"
+                   hx-get="{% url 'notes:section_create' topic.id  %}"
+                   hx-taget="#create-section"
+                   hx-swap="outerHTML"
+                >
+                    <div class="service-card h-100 p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="bi bi-plus-circle" style="font-size: 2rem; color: green;"></i>
+                        </div>
+                        <h4 class="service-title text-center mb-3 text-success">Add</h4>
+                        <p class="service-text text-center mb-0 text-success">Create new section</p>
                     </div>
-                    <h4 class="service-title text-center mb-3 text-success">Add</h4>
-                    <p class="service-text text-center mb-0 text-success">Create new section</p>
-                </div>
-            </a>
-        </div>
-        {% for section in topic.sections.all %}
-        <div class="col-md-4">
-            <a href="{{ section.get_absolute_url }}" style="text-decoration: none">
-                <div class="service-card h-100 p-4">
-                    <div class="icon-wrapper mb-4">
-                        <i class="bi bi-{{ section.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                </a>
+            </div>
+            {% for section in topic.sections.all %}
+            <div class="col-md-4" id="section-{{ section.id }}">
+                <a href="{{ section.get_absolute_url }}" style="text-decoration: none">
+                    <div class="service-card h-100 p-4  position-relative">
+                        <div class="icon-wrapper mb-4">
+                            <i class="bi bi-{{ section.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                        </div>
+                        <h4 class="service-title text-center mb-3">{{ section.title }}</h4>
+                        {% if section.description  %}<p class="service-text text-center mb-0">{{ section.description }}</p>{% endif %}
+                        <div class=" position-absolute end-0 bottom-0 mb-2 me-2 d-flex gap-2">
+                            <span
+                               hx-get="{% url 'notes:section_update' section.id %}"
+                               hx-swap="innerHTML"
+                               hx-target="#section-{{ section.id }}"
+                            >
+                              <i class="bi bi-pencil text-primary"></i>
+                            </span>
+                            <span
+                               hx-delete="{% url 'notes:section_delete' section.id %}"
+                               hx-target="#section-{{ section.id }}"
+                               hx-swap='delete'
+                               hx-confirm="Delete section?"
+                            >
+                                <i class="bi bi-trash text-danger"></i>
+                            </span>
+                        </div>
                     </div>
-                    <h4 class="service-title text-center mb-3">{{ section.title }}</h4>
-                    {% if section.description  %}<p class="service-text text-center mb-0">{{ section.description }}</p>{% endif %}
-                </div>
-            </a>
-
-        </div>
-        {% endfor %}
+                </a>
+            </div>
+            {% endfor %}
+        {% endpartialdef sections %}
     </div>
 </div>
 {% endblock content %}
