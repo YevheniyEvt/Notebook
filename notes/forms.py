@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div
 from django import forms
 
-from notes.models import Topic, Section, Code, Article
+from notes.models import Topic, Section, Code, Article, Links
 
 
 class BaseSectionTopicForm(forms.ModelForm):
@@ -67,3 +67,17 @@ class SectionArticleForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = 'hx-section-article-form'
         self.fields['content'].label = ''
+
+
+class SectionLinksForm(forms.ModelForm):
+    class Meta:
+        model = Links
+        fields = ('title', 'content', 'url',)
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 1}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'hx-section-link-form'

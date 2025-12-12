@@ -111,7 +111,7 @@ class Image(models.Model):
 class Links(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)

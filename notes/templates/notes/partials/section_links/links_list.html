@@ -1,0 +1,41 @@
+<div class="container"
+     hx-get="{% url 'notes:link_list' section.id %}"
+     hx-target="this"
+     hx-swap="outerHTML"
+     hx-trigger="rerenderLinksList"
+>
+    <span class="rounded-circle" type="button"
+        hx-get="{% url 'notes:link_create' section.id %}"
+        hx-target="this"
+        hx-swap="afterend"
+    >
+        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 2rem;"></i>
+    </span>
+    {% if links %}
+    {% for link in links %}
+        <div class="border rounded-3 border-primary-subtle p-2 mt-3" id="link-{{ link.id }}">
+            <div class="d-flex gap-2 mb-1">
+                <span
+                   hx-get="{% url 'notes:link_update' link.id %}"
+                   hx-swap="innerHTML"
+                   hx-target="#link-{{ link.id }}"
+                >
+                  <i class="bi bi-pencil text-primary"></i>
+                </span>
+                <span
+                   hx-delete="{% url 'notes:link_delete' link.id %}"
+                   hx-target="#link-{{ link.id }}"
+                   hx-swap="delete"
+                   hx-confirm="Delete link?"
+                >
+                    <i class="bi bi-trash text-danger"></i>
+                </span>
+            </div>
+            <a href="{{ link.url }}" target="_blank">{% if link.title %}{{ link.title }}{% else %}{{ link.url|truncatechars:100 }}{% endif %}</a>
+        <p>{{ link.content }}</p>
+        </div>
+    {% endfor %}
+    {% else %}
+        <h3 class="d-flex justify-content-center">No links</h3>
+    {% endif %}
+</div>

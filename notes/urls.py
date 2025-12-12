@@ -29,7 +29,13 @@ urlpatterns = [
     path("article/<int:pk>/update/", views.SectionArticleUpdateView.as_view(), name="article_update"),
     path("article/<int:pk>/delete/", views.SectionArticleDeleteView.as_view(), name="article_delete"),
 
+
     path("section/<int:pk>/links/", views.SectionLinksListView.as_view(), name="link_list"),
+    path("section/<int:pk>/link/create/", views.SectionLinksCreateView.as_view(), name="link_create"),
+    path("link/<int:pk>/update/", views.SectionLinksUpdateView.as_view(), name="link_update"),
+    path("link/<int:pk>/delete/", views.SectionLinksDeleteView.as_view(), name="link_delete"),
+
+
     path("section/<int:pk>/images/", views.SectionImageListView.as_view(), name="image_list"),
 
 ]
