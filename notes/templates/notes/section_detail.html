@@ -19,7 +19,7 @@
           <span class="visually-hidden">Home</span>
         </a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'notes:topic_list' %}">Topics</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'notes:topic_list' %}">Notes</a></li>
       <li class="breadcrumb-item active" aria-current="page"><a href="{{ section.topic.get_absolute_url }}">{{ section.topic.title }}</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{ section.title }}</li>
     </ol>
@@ -28,6 +28,22 @@
 
 {% endblock header %}
 {% block content %}
+<div class="px-3 py-2 border-bottom mb-3">
+  <div class="container">
+    <form
+      class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
+      role="search"
+    >
+      <input
+        type="search"
+        name="search"
+        class="form-control"
+        placeholder="Search..."
+        aria-label="Search"
+      />
+    </form>
+  </div>
+</div>
 
 <div class="container">
     <div class="col-12 text-center mb-3">

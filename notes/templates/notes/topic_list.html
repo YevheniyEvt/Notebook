@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static partials %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'notes/style.css' %}">
@@ -19,17 +19,46 @@
           <span class="visually-hidden">Home</span>
         </a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">Topics</li>
+      <li class="breadcrumb-item active" aria-current="page">Notes</li>
     </ol>
   </nav>
 </div>
 {% endblock header %}
 
 {% block content %}
+<div class="px-3 py-2 border-bottom mb-3">
+  <div class="container">
+    <form
+      class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
+      role="search"
+    >
+      <input
+        type="search"
+        name="search"
+        class="form-control"
+        placeholder="Search..."
+        aria-label="Search"
+      />
+    </form>
+  </div>
+</div>
+
 <div class="container">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <a href="#" style="text-decoration: none">
+    <div class="row g-4"
+         hx-get="{% url 'notes:topic_list' %}"
+         hx-taget="this"
+         hx-swap="innerHTML"
+         hx-trigger="rerenderTopicList from:body"
+
+    >
+        {% partialdef topic-list inline %}
+        <div class="col-md-4" id="create-topic">
+            <a href="#"
+               style="text-decoration: none"
+               hx-get="{% url 'notes:topic_create' %}"
+               hx-taget="#create-topic"
+               hx-swap="outerHTML"
+            >
                 <div class="service-card h-100 p-4">
                     <div class="icon-wrapper mb-4">
                         <i class="bi bi-plus-circle" style="font-size: 2rem; color: green;"></i>
@@ -40,18 +69,36 @@
             </a>
         </div>
         {% for topic in topics %}
-        <div class="col-md-4">
+        <div class="col-md-4" id="topic-{{ topic.id }}">
             <a href="{{ topic.get_absolute_url }}" style="text-decoration: none">
-                <div class="service-card h-100 p-4">
+                <div class="service-card h-100 p-4 position-relative">
                     <div class="icon-wrapper mb-4">
                         <i class="bi bi-{{ topic.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
                     </div>
                     <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
-                    {% if topic.description  %}<p class="service-text text-center mb-0">{{ topic.description }}</p>{% endif %}
+                    <p class="service-text text-center mb-0">{% if topic.description  %}{{ topic.description }}{% endif %}</p>
+                    <div class=" position-absolute end-0 bottom-0 mb-2 me-2 d-flex gap-2">
+                        <span
+                           hx-get="{% url 'notes:topic_update' topic.id %}"
+                           hx-swap="innerHTML"
+                           hx-target="#topic-{{ topic.id }}"
+                        >
+                          <i class="bi bi-pencil text-primary"></i>
+                        </span>
+                        <span
+                           hx-delete="{% url 'notes:topic_delete' topic.id %}"
+                           hx-target="#topic-{{ topic.id }}"
+                           hx-swap='delete'
+                           hx-confirm="Delete topic?"
+                        >
+                            <i class="bi bi-trash text-danger"></i>
+                        </span>
+                    </div>
                 </div>
             </a>
         </div>
         {% endfor %}
+        {% endpartialdef topic-list %}
     </div>
 </div>
 {% endblock content %}

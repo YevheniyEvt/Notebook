@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+
+{% crispy form %}
+<button class="btn btn-primary btn-sm"
+      hx-post="{% url 'notes:topic_create' %}"
+      hx-include="#hx-topic-form"
+      hx-target="#create-topic"
+>
+  Create
+</button>
+<button class="btn btn-secondary btn-sm"
+        hx-get="{% url 'notes:topic_list' %}"
+        hx-target="#create-topic"
+        hx-select="#create-topic"
+        hx-swap="outerHTML"
+>
+  Cancel
+</button>

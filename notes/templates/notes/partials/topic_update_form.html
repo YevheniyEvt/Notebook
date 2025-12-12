@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+
+{% crispy form %}
+<button class="btn btn-primary btn-sm"
+      hx-post="{% url 'notes:topic_update' form.instance.id %}"
+      hx-include="#hx-topic-form"
+      hx-target="#topic-{{ form.instance.id }}"
+>
+  Update
+</button>
+<button class="btn btn-secondary btn-sm"
+        hx-get="{% url 'notes:topic_list' %}"
+        hx-target="#topic-{{ form.instance.id }}"
+        hx-select="#topic-{{ form.instance.id }}"
+        hx-swap="outerHTML"
+>
+  Cancel
+</button>
