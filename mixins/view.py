@@ -78,3 +78,17 @@ class HTMXDeleteViewMixin:
             trigger_client_event(response, client_event)
         return response
 
+class PkInFormKwargsMixin:
+    """
+    Add pk from kwargs to form kwargs.
+    In for it should be pop.
+    Example:
+        def __init__(self, *args, **kwargs):
+        self.related_instance_id = kwargs.pop('related_instance_id')
+        super().__init__(*args, **kwargs)
+    """
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['related_instance_id'] = self.kwargs['pk']
+        return kwargs

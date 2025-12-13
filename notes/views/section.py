@@ -4,7 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionCreateForm, SectionUpdateForm
+from mixins.view import PkInFormKwargsMixin
+from notes.forms import SectionCreateHTMXForm, SectionUpdateHTMXForm
 from notes.models import Section
 
 __all__ = [
@@ -23,9 +24,9 @@ class SectionDetail(DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class SectionCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
+class SectionCreateView(LoginRequiredMixin, HTMXViewFormMixin, PkInFormKwargsMixin, CreateView):
     model = Section
-    form_class = SectionCreateForm
+    form_class = SectionCreateHTMXForm
     htmx_client_events = ['rerenderSectionList']
     template_name = 'notes/partials/section_form.html'
 
@@ -38,15 +39,10 @@ class SectionCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Section created.')
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['topic_id'] = self.kwargs['pk']
-        return kwargs
-
 
 class SectionUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Section
-    form_class = SectionUpdateForm
+    form_class = SectionUpdateHTMXForm
     htmx_client_events = ['rerenderSectionList']
     template_name = 'notes/partials/section_update_form.html'
 
@@ -57,6 +53,10 @@ class SectionUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
         messages.success(self.request, 'Section updated.')
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['related_instance_id'] = self.object.topic_id
+        return kwargs
 
 class SectionDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Section

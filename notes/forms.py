@@ -6,319 +6,145 @@ from django.urls import reverse
 from notes.models import Topic, Section, Code, Article, Links, Image
 
 
-class BaseSectionTopicForm(forms.ModelForm):
-    form_id = None
+class BaseNoteHTMXForm(forms.ModelForm):
+    """
+      Base HTMX-aware ModelForm for Note-like models that supports both Create and Update workflows.
+
+      This form encapsulates common behavior shared by all note-related forms:
+      - Automatically detects whether the form is used for creation or update.
+      - Builds HTMX attributes (`hx-post`, `hx-target`, etc.) dynamically
+        according to the current operation.
+      - Integrates with django-crispy-forms via FormHelper.
+      - Provides reusable action and cancel buttons with HTMX-powered behavior.
+
+      Expected conventions:
+      - The associated model MUST implement:
+          - `get_create_url(...)` (class method or static method)
+          - `get_update_url(...)` (instance method)
+          - `get_hx_rerender_url(...)` (class method or static method)
+
+      Extension points:
+      - `fields_layout` can be overridden to customize field ordering or layout.
+      - `action_button` can be overridden to change submit button behavior or style.
+      - `cancel_form_button` can be overridden to customize cancel action logic.
+
+      HTMX behavior:
+      - On submit, the form is posted via `hx-post` to the resolved action URL.
+      - On cancel, the form is replaced (`outerHTML`) with a re-rendered fragment.
+
+      This class is intended to be subclassed and should not be used directly
+      without following the required naming and model conventions.
+      """
+
+    def __init__(self, *args, **kwargs):
+        self.related_instance_id = kwargs.pop('related_instance_id', None)
+        super().__init__(*args, **kwargs)
+
+        self.is_create_form = self.instance.id is None
+        self.is_update_form = self.instance.id is not None
+
+        self.hx_target = (
+            f'#create-{self._meta.model.__name__.lower()}'
+            if self.is_create_form
+            else f'#{self._meta.model.__name__.lower()}-{self.instance.id}'
+    )
+        self.form_action_url = (
+                self._meta.model.get_create_url(related_instance_id=self.related_instance_id)
+                if self.is_create_form
+                else self.instance.get_update_url()
+            )
+
+        self.helper = FormHelper()
+        self.helper.form_id = f'hx-create-{self._meta.model.__name__.lower()}'
+        self.helper.attrs = {
+            'hx-post': self.form_action_url,
+            'hx-target': self.hx_target,
+        }
+        self.helper.layout = Layout(
+            *self.fields_layout,
+            self.action_button,
+            self.cancel_form_button,
+        )
+
+    @property
+    def fields_layout(self):
+        return self.fields
+
+    @property
+    def action_button(self):
+        return Submit(
+                value='Create' if self.is_create_form else 'Update',
+                name='Create' if self.is_create_form else 'Update',
+                css_class='btn btn-primary btn-sm',
+            )
+
+    @property
+    def cancel_form_button(self):
+        return Button(
+                value='Cancel',
+                name='Cancel',
+                css_class='btn btn-secondary btn-sm',
+                hx_get = self._meta.model.get_hx_rerender_url(related_instance_id=self.related_instance_id),
+                hx_target = self.hx_target,
+                hx_select = self.hx_target,
+                hx_swap = "outerHTML",
+            )
+
+
+class BaseTopicSectionHTMXForm(BaseNoteHTMXForm):
+    fields_layout = [
+        Div(
+        'title',
+        'bootstrap_icon_name',
+        css_class='d-inline-flex gap-4'
+        ),
+        'description'
+    ]
+
     class Meta:
         fields = ('title', 'description', 'bootstrap_icon_name')
         widgets = {
             'description': forms.Textarea(attrs={'rows': 1}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = self.form_id
-        self.helper.form_class = 'blueForms'
-        self.helper.form_method = 'post'
-        self.helper.form_action = 'submit_survey'
-
-        self.helper.layout = Layout(
-            Div(
-                'title',
-                'bootstrap_icon_name',
-                css_class='d-inline-flex gap-4'
-            ),
-            'description',
-        )
-
-
-class TopicCreateForm(forms.ModelForm):
-    class Meta:
+class TopicCreateHTMXForm(BaseTopicSectionHTMXForm):
+    class Meta(BaseTopicSectionHTMXForm.Meta):
         model = Topic
-        fields = ('title', 'description', 'bootstrap_icon_name')
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 1}),
-        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-topic-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:topic_create'),
-            'hx-target': f'#create-topic',
-        }
+class TopicUpdateHTMXForm(BaseTopicSectionHTMXForm):
+    class Meta(BaseTopicSectionHTMXForm.Meta):
+        model = Topic
 
-        self.helper.layout = Layout(
-            Div(
-                'title',
-                'bootstrap_icon_name',
-                css_class='d-inline-flex gap-4'
-            ),
-            'description',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:topic_list'),
-                hx_target = f"#create-topic",
-                hx_select = f"#create-topic",
-                hx_swap = "outerHTML",
-            )
-        )
-
-class TopicUpdateForm(forms.ModelForm):
-    class Meta(TopicCreateForm.Meta):
-        pass
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-topic-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:topic_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#topic-{ self.instance.id }',
-        }
-
-        self.helper.layout = Layout(
-            Div(
-                'title',
-                'bootstrap_icon_name',
-                css_class='d-inline-flex gap-4'
-            ),
-            'description',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:topic_list'),
-                hx_target = f"#topic-{ self.instance.id }",
-                hx_select = f"#topic-{ self.instance.id }",
-                hx_swap = "outerHTML",
-            )
-        )
-
-class SectionCreateForm(forms.ModelForm):
-    class Meta:
+class SectionCreateHTMXForm(BaseTopicSectionHTMXForm):
+    class Meta(BaseTopicSectionHTMXForm.Meta):
         model = Section
-        fields = ('title', 'description', 'bootstrap_icon_name')
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 1}),
-        }
 
-    def __init__(self, *args, **kwargs):
-        topic_id = kwargs.pop('topic_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:section_create', kwargs={'pk': topic_id}),
-            'hx-target': f'#create-section',
-        }
+class SectionUpdateHTMXForm(BaseTopicSectionHTMXForm):
+    class Meta(BaseTopicSectionHTMXForm.Meta):
+        model = Section
 
-        self.helper.layout = Layout(
-            Div(
-                'title',
-                'bootstrap_icon_name',
-                css_class='d-inline-flex gap-4'
-            ),
-            'description',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:topic_detail', kwargs={'pk': topic_id}),
-                hx_target = f"#create-section",
-                hx_select = f"#create-section",
-                hx_swap = "outerHTML",
-            )
-        )
 
-class SectionUpdateForm(forms.ModelForm):
-    class Meta(SectionCreateForm.Meta):
+class SectionCodeCreateHTMXForm(BaseNoteHTMXForm):
+    class Meta:
+        model = Code
+        fields = ('content',)
+
+class SectionCodeUpdateHTMXForm(SectionCodeCreateHTMXForm):
+    class Meta(SectionCodeCreateHTMXForm.Meta):
         pass
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:section_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#section-{ self.instance.id}',
-        }
 
-        self.helper.layout = Layout(
-            Div(
-                'title',
-                'bootstrap_icon_name',
-                css_class='d-inline-flex gap-4'
-            ),
-            'description',
-            Submit(
-                value='Update',
-                name='Update',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:topic_detail', kwargs={'pk': self.instance.topic_id}),
-                hx_target = f"#section-{ self.instance.id}",
-                hx_select = f"#section-{ self.instance.id}",
-                hx_swap = "outerHTML",
-            )
-        )
-
-class SectionCodeCreateForm(forms.ModelForm):
-    class Meta:
-        model = Code
-        fields = ('content',)
-
-    def __init__(self, *args, **kwargs):
-        section_id= kwargs.pop('section_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-code-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:code_create', kwargs={'pk': section_id}),
-            'hx-target': f'#code-create',
-        }
-        self.helper.layout = Layout(
-            'content',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get="#",
-                hx_target="#code-create",
-                hx_swap="delete",
-                hx_trigger="click",
-            )
-        )
-
-class SectionCodeUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Code
-        fields = ('content',)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-code-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:code_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#code-{ self.instance.id  }',
-        }
-        self.helper.layout = Layout(
-            'content',
-            Submit(
-                value='Update',
-                name='Update',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:code_list', kwargs={'pk': self.instance.section_id}),
-                hx_target = f"#code-{ self.instance.id}",
-                hx_select = f"#code-{ self.instance.id}",
-                hx_swap = "outerHTML",
-            )
-        )
-
-
-class SectionArticleCreateForm(forms.ModelForm):
+class SectionArticleCreateHTMXForm(BaseNoteHTMXForm):
     class Meta:
         model = Article
         fields = ('content',)
 
-    def __init__(self, *args, **kwargs):
-        section_id = kwargs.pop('section_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-article-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:article_create', kwargs={'pk': section_id}),
-            'hx-target': f'#article-create',
-        }
-        self.helper.layout = Layout(
-            'content',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get="#",
-                hx_target="#article-create",
-                hx_swap="delete",
-                hx_trigger="click",
-            )
-        )
+class SectionArticleUpdateHTMXForm(SectionArticleCreateHTMXForm):
+    class Meta(SectionArticleCreateHTMXForm.Meta):
+        pass
 
 
-class SectionArticleUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Article
-        fields = ('content',)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-article-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:article_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#article-{ self.instance.id  }',
-        }
-        self.helper.layout = Layout(
-            'content',
-            Submit(
-                value='Update',
-                name='Update',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:article_list', kwargs={'pk': self.instance.section_id}),
-                hx_target = f"#article-{ self.instance.id}",
-                hx_select = f"#article-{ self.instance.id}",
-                hx_swap = "outerHTML",
-            )
-        )
-
-
-class SectionLinksCreateForm(forms.ModelForm):
+class SectionLinksCreateHTMXForm(BaseNoteHTMXForm):
     class Meta:
         model = Links
         fields = ('title', 'content', 'url',)
@@ -326,75 +152,12 @@ class SectionLinksCreateForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 1}),
         }
 
-    def __init__(self, *args, **kwargs):
-        section_id = kwargs.pop('section_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-link-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:link_create', kwargs={'pk': section_id}),
-            'hx-target': f'#link-create',
-        }
-        self.helper.layout = Layout(
-            'title',
-            'content',
-            'url',
-            Submit(
-                value='Create',
-                name='Create',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get="#",
-                hx_target="#link-create",
-                hx_swap="delete",
-                hx_trigger="click",
-            )
-        )
-
-class SectionLinksUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Links
-        fields = ('title', 'content', 'url',)
-        widgets = {
-            'content': forms.Textarea(attrs={'rows': 1}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-link-form'
-        self.fields['content'].label = ''
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:link_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#link-{ self.instance.id  }',
-        }
-        self.helper.layout = Layout(
-            'title',
-            'content',
-            'url',
-            Submit(
-                value='Update',
-                name='Update',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:link_list', kwargs={'pk': self.instance.section_id}),
-                hx_target = f"#link-{ self.instance.id}",
-                hx_select = f"#link-{ self.instance.id}",
-                hx_swap = "outerHTML",
-            )
-        )
+class SectionLinksUpdateHTMXForm(SectionLinksCreateHTMXForm):
+    class Meta(SectionLinksCreateHTMXForm.Meta):
+        pass
 
 
-class SectionImageCreateForm(forms.ModelForm):
+class SectionImageCreateHTMXForm(BaseNoteHTMXForm):
     class Meta:
         model = Image
         fields = ('title', 'description', 'image_file',)
@@ -402,70 +165,6 @@ class SectionImageCreateForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 1}),
         }
 
-    def __init__(self, *args, **kwargs):
-        section_id = kwargs.pop('section_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-image-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:image_create', kwargs={'pk': section_id}),
-            'hx-target': '#image-create',
-        }
-
-        self.helper.layout = Layout(
-            'title',
-            'description',
-            'image_file',
-            Submit(
-                value='Add',
-                name='Add',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get="#",
-                hx_target="#image-create",
-                hx_swap="delete",
-                hx_trigger="click",
-            )
-        )
-
-class SectionImageUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Image
-        fields = ('title', 'description', )
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 1}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        section_id = kwargs.pop('section_id')
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'hx-section-image-form'
-        self.helper.attrs = {
-            'hx-post':  reverse('notes:image_update', kwargs={'pk': self.instance.id}),
-            'hx-target': f'#image-{ self.instance.id }',
-        }
-
-        self.helper.layout = Layout(
-            'title',
-            'description',
-            'image_file',
-            Submit(
-                value='Update',
-                name='Update',
-                css_class='btn btn-primary btn-sm',
-            ),
-            Button(
-                value='Cancel',
-                name='Cancel',
-                css_class='btn btn-secondary btn-sm',
-                hx_get = reverse('notes:image_list', kwargs={'pk': section_id}),
-                hx_target = f"#image-{ self.instance.id  }",
-                hx_select = f"#image-{ self.instance.id  }",
-                hx_swap = "outerHTML",
-            )
-        )
+class SectionImageUpdateHTMXForm(SectionImageCreateHTMXForm):
+    class Meta(SectionImageCreateHTMXForm.Meta):
+        fields = ('title', 'description',)

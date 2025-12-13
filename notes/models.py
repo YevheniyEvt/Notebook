@@ -39,6 +39,17 @@ class Topic(models.Model):
     def get_absolute_url(self):
         return reverse('notes:topic_detail', kwargs={'pk': self.pk})
 
+    def get_update_url(self, **kwargs):
+        return reverse('notes:topic_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:topic_create')
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:topic_list')
+
 
 class Section(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -54,6 +65,17 @@ class Section(models.Model):
     def get_absolute_url(self):
         return reverse('notes:section_detail', kwargs={'pk': self.pk})
 
+    def get_update_url(self, **kwargs):
+        return reverse('notes:section_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:section_create', kwargs={'pk': kwargs['related_instance_id']})
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:topic_detail', kwargs={'pk': kwargs['related_instance_id']})
+
 
 class Code(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -64,6 +86,17 @@ class Code(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    def get_update_url(self, **kwargs):
+        return reverse('notes:code_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:code_create', kwargs={'pk': kwargs['related_instance_id']})
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:code_list', kwargs={'pk': kwargs['related_instance_id']})
+
 class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
@@ -72,6 +105,17 @@ class Article(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def get_update_url(self, **kwargs):
+        return reverse('notes:article_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:article_create', kwargs={'pk': kwargs['related_instance_id']})
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:article_list', kwargs={'pk': kwargs['related_instance_id']})
 
 
 class Image(models.Model):
@@ -107,6 +151,17 @@ class Image(models.Model):
             )
         return None
 
+    def get_update_url(self, **kwargs):
+        return reverse('notes:image_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:image_create', kwargs={'pk': kwargs['related_instance_id']})
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:image_list', kwargs={'pk': kwargs['related_instance_id']})
+
 
 class Links(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -118,3 +173,14 @@ class Links(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def get_update_url(self, **kwargs):
+        return reverse('notes:link_update', kwargs={'pk': self.id})
+
+    @classmethod
+    def get_create_url(cls, **kwargs):
+        return reverse('notes:link_create', kwargs={'pk': kwargs['related_instance_id']})
+
+    @classmethod
+    def get_hx_rerender_url(cls, **kwargs):
+        return reverse('notes:link_list', kwargs={'pk': kwargs['related_instance_id']})

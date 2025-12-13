@@ -1,4 +1,4 @@
 {% load crispy_forms_tags %}
-<div class="border border-primary p-2 mb-3 rounded-3 col-sm-6 col-lg-4" id="image-create">
+<div class="border border-primary p-2 mb-3 rounded-3 {% if form.is_create_form %}col-sm-6 col-lg-4{% endif %}" id="create-image">
     {% crispy form %}
 </div>

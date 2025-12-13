@@ -3,7 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionArticleCreateForm, SectionArticleUpdateForm
+from mixins.view import PkInFormKwargsMixin
+from notes.forms import SectionArticleCreateHTMXForm, SectionArticleUpdateHTMXForm
 from notes.models import Article, Section
 
 __all__ = [
@@ -26,11 +27,11 @@ class SectionArticleListView(ListView):
         context = super().get_context_data(**kwargs)
         context['section'] = Section.objects.get(id=self.kwargs['pk'])
         return context
-    
 
-class SectionArticleCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
+
+class SectionArticleCreateView(LoginRequiredMixin, HTMXViewFormMixin, PkInFormKwargsMixin, CreateView):
     model = Article
-    form_class = SectionArticleCreateForm
+    form_class = SectionArticleCreateHTMXForm
     template_name = 'notes/partials/section_article/article_form.html'
     htmx_client_events = ['rerenderArticleList']
 
@@ -43,16 +44,11 @@ class SectionArticleCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView
         messages.success(self.request, 'Article added.')
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['section_id'] = self.kwargs['pk']
-        return kwargs
-
 
 class SectionArticleUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Article
-    form_class = SectionArticleUpdateForm
-    template_name = 'notes/partials/section_article/article_update_form.html'
+    form_class = SectionArticleUpdateHTMXForm
+    template_name = 'notes/partials/section_article/article_form.html'
     htmx_client_events = ['rerenderArticleList']
 
     def get_queryset(self):
@@ -61,6 +57,11 @@ class SectionArticleUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView
     def form_valid(self, form):
         messages.success(self.request, 'Article updated.')
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['related_instance_id'] = self.object.section_id
+        return kwargs
 
 
 class SectionArticleDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):

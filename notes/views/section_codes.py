@@ -3,7 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionCodeCreateForm, SectionCodeUpdateForm
+from mixins.view import PkInFormKwargsMixin
+from notes.forms import SectionCodeCreateHTMXForm, SectionCodeUpdateHTMXForm
 from notes.models import Code, Section
 
 __all__ = [
@@ -28,9 +29,9 @@ class SectionCodeListView(LoginRequiredMixin, ListView):
         return context
 
 
-class SectionCodeCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
+class SectionCodeCreateView(LoginRequiredMixin, HTMXViewFormMixin, PkInFormKwargsMixin, CreateView):
     model = Code
-    form_class = SectionCodeCreateForm
+    form_class = SectionCodeCreateHTMXForm
     template_name = 'notes/partials/section_code/code_form.html'
     htmx_client_events = ['rerenderCodeList']
 
@@ -43,15 +44,11 @@ class SectionCodeCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Code added.')
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['section_id'] = self.kwargs['pk']
-        return kwargs
 
 class SectionCodeUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Code
-    form_class = SectionCodeUpdateForm
-    template_name = 'notes/partials/section_code/code_update_form.html'
+    form_class = SectionCodeUpdateHTMXForm
+    template_name = 'notes/partials/section_code/code_form.html'
     htmx_client_events = ['rerenderCodeList']
 
     def get_queryset(self):
@@ -61,6 +58,10 @@ class SectionCodeUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
         messages.success(self.request, 'Code updated.')
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['related_instance_id'] = self.object.section_id
+        return kwargs
 
 class SectionCodeDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Code

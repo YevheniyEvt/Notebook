@@ -4,7 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionImageCreateForm, SectionImageUpdateForm
+from mixins.view import PkInFormKwargsMixin
+from notes.forms import SectionImageCreateHTMXForm, SectionImageUpdateHTMXForm
 from notes.models import Image, Section
 
 __all__ = [
@@ -28,9 +29,9 @@ class SectionImageListView(ListView):
         return context
 
 
-class SectionImageCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
+class SectionImageCreateView(LoginRequiredMixin, HTMXViewFormMixin, PkInFormKwargsMixin, CreateView):
     model = Image
-    form_class = SectionImageCreateForm
+    form_class = SectionImageCreateHTMXForm
     template_name = 'notes/partials/section_image/image_form.html'
     htmx_client_events = ['rerenderImageList']
 
@@ -48,15 +49,11 @@ class SectionImageCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         context['section'] = Section.objects.get(id=self.kwargs['pk'])
         return context
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'section_id': self.kwargs['pk']})
-        return kwargs
 
 class SectionImageUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Image
-    form_class = SectionImageUpdateForm
-    template_name = 'notes/partials/section_image/image_update_form.html'
+    form_class = SectionImageUpdateHTMXForm
+    template_name = 'notes/partials/section_image/image_form.html'
     htmx_client_events = ['rerenderImageList']
 
     def get_queryset(self):
@@ -68,7 +65,7 @@ class SectionImageUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({'section_id': self.object.section_id})
+        kwargs.update({'related_instance_id': self.object.section_id})
         return kwargs
 
 

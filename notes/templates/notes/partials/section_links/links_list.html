@@ -13,18 +13,18 @@
     </span>
     {% if links %}
     {% for link in links %}
-        <div class="border rounded-3 border-primary-subtle p-2 mt-3" id="link-{{ link.id }}">
+        <div class="border rounded-3 border-primary-subtle p-2 mt-3" id="links-{{ link.id }}">
             <div class="d-flex gap-2 mb-1">
                 <span
                    hx-get="{% url 'notes:link_update' link.id %}"
                    hx-swap="innerHTML"
-                   hx-target="#link-{{ link.id }}"
+                   hx-target="#links-{{ link.id }}"
                 >
                   <i class="bi bi-pencil text-primary"></i>
                 </span>
                 <span
                    hx-delete="{% url 'notes:link_delete' link.id %}"
-                   hx-target="#link-{{ link.id }}"
+                   hx-target="#links-{{ link.id }}"
                    hx-swap="delete"
                    hx-confirm="Delete link?"
                 >

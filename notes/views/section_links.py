@@ -3,7 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionLinksCreateForm, SectionLinksUpdateForm
+from mixins.view import PkInFormKwargsMixin
+from notes.forms import SectionLinksCreateHTMXForm, SectionLinksUpdateHTMXForm
 from notes.models import Links, Section
 
 __all__ = [
@@ -28,9 +29,9 @@ class SectionLinksListView(ListView):
         return context
 
 
-class SectionLinksCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
+class SectionLinksCreateView(LoginRequiredMixin, HTMXViewFormMixin, PkInFormKwargsMixin, CreateView):
     model = Links
-    form_class = SectionLinksCreateForm
+    form_class = SectionLinksCreateHTMXForm
     template_name = 'notes/partials/section_links/links_form.html'
     htmx_client_events = ['rerenderLinksList']
 
@@ -43,16 +44,11 @@ class SectionLinksCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Links added.')
         return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['section_id'] = self.kwargs['pk']
-        return kwargs
-
 
 class SectionLinksUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Links
-    form_class = SectionLinksUpdateForm
-    template_name = 'notes/partials/section_links/links_update_form.html'
+    form_class = SectionLinksUpdateHTMXForm
+    template_name = 'notes/partials/section_links/links_form.html'
     htmx_client_events = ['rerenderLinksList']
 
     def get_queryset(self):
@@ -62,6 +58,10 @@ class SectionLinksUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
         messages.success(self.request, 'Links updated.')
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['related_instance_id'] = self.object.section_id
+        return kwargs
 
 class SectionLinksDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Links
