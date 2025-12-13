@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import TopicForm
+from notes.forms import TopicCreateForm, TopicUpdateForm
 from notes.models import Topic
 
 __all__ = [
@@ -44,7 +44,7 @@ class TopicDetail(LoginRequiredMixin, DetailView):
 
 class TopicCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Topic
-    form_class = TopicForm
+    form_class = TopicCreateForm
     htmx_client_events = ['rerenderTopicList']
     template_name = 'notes/partials/topic_form.html'
 
@@ -59,7 +59,7 @@ class TopicCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
 
 class TopicUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Topic
-    form_class = TopicForm
+    form_class = TopicUpdateForm
     htmx_client_events = ['rerenderTopicList']
     template_name = 'notes/partials/topic_update_form.html'
 

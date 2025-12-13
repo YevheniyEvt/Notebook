@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionArticleForm
+from notes.forms import SectionArticleCreateForm, SectionArticleUpdateForm
 from notes.models import Article, Section
 
 __all__ = [
@@ -30,7 +30,7 @@ class SectionArticleListView(ListView):
 
 class SectionArticleCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Article
-    form_class = SectionArticleForm
+    form_class = SectionArticleCreateForm
     template_name = 'notes/partials/section_article/article_form.html'
     htmx_client_events = ['rerenderArticleList']
 
@@ -43,15 +43,15 @@ class SectionArticleCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView
         messages.success(self.request, 'Article added.')
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['section'] = Section.objects.get(id=self.kwargs['pk'])
-        return context
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['section_id'] = self.kwargs['pk']
+        return kwargs
 
 
 class SectionArticleUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Article
-    form_class = SectionArticleForm
+    form_class = SectionArticleUpdateForm
     template_name = 'notes/partials/section_article/article_update_form.html'
     htmx_client_events = ['rerenderArticleList']
 

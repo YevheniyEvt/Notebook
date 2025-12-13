@@ -1,21 +1,6 @@
 {% load crispy_forms_tags %}
 <div class="border border-primary p-2 mb-3 rounded-3" id="link-create">
         {% crispy form %}
-    <button class="btn btn-primary btn-sm"
-          hx-post="{% url 'notes:link_create' section.id %}"
-          hx-include="#hx-section-link-form"
-          hx-target="#link-create"
-    >
-      Create
-    </button>
-    <button class="btn btn-secondary btn-sm"
-            hx-get="#"
-            hx-target="#link-create"
-            hx-swap="delete"
-            hx-trigger="click"
-    >
-      Cancel
-    </button>
 </div>
 
 

@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionCodeForm
+from notes.forms import SectionCodeCreateForm, SectionCodeUpdateForm
 from notes.models import Code, Section
 
 __all__ = [
@@ -30,7 +30,7 @@ class SectionCodeListView(LoginRequiredMixin, ListView):
 
 class SectionCodeCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Code
-    form_class = SectionCodeForm
+    form_class = SectionCodeCreateForm
     template_name = 'notes/partials/section_code/code_form.html'
     htmx_client_events = ['rerenderCodeList']
 
@@ -43,15 +43,14 @@ class SectionCodeCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Code added.')
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['section'] = Section.objects.get(id=self.kwargs['pk'])
-        return context
-
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['section_id'] = self.kwargs['pk']
+        return kwargs
 
 class SectionCodeUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Code
-    form_class = SectionCodeForm
+    form_class = SectionCodeUpdateForm
     template_name = 'notes/partials/section_code/code_update_form.html'
     htmx_client_events = ['rerenderCodeList']
 

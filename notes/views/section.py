@@ -4,8 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionForm
-from notes.models import Section, Topic
+from notes.forms import SectionCreateForm, SectionUpdateForm
+from notes.models import Section
 
 __all__ = [
     'SectionDetail',
@@ -25,7 +25,7 @@ class SectionDetail(DetailView):
 
 class SectionCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Section
-    form_class = SectionForm
+    form_class = SectionCreateForm
     htmx_client_events = ['rerenderSectionList']
     template_name = 'notes/partials/section_form.html'
 
@@ -38,15 +38,15 @@ class SectionCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Section created.')
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['topic'] = Topic.objects.get(id=self.kwargs['pk'])
-        return context
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['topic_id'] = self.kwargs['pk']
+        return kwargs
 
 
 class SectionUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Section
-    form_class = SectionForm
+    form_class = SectionUpdateForm
     htmx_client_events = ['rerenderSectionList']
     template_name = 'notes/partials/section_update_form.html'
 

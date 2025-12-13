@@ -6,7 +6,7 @@
   <div class="modal-body" >
     <div class="p-3 rounded text-start">
         <h3>{{ task.title }}</h3>
-        <p class="lead">{{ task.description }}</p>
+        <p class="lead">{{ task.description|linebreaksbr }}</p>
     </div>
 
     <div id="task-comments"
@@ -21,7 +21,7 @@
                  hx-target="this"
                  hx-swap="delete"
             >
-                <p class="lead mb-0">{{ comment.comment }}</p>
+                <p class="lead mb-0">{{ comment.comment|linebreaksbr }}</p>
 
                 <a href="#"
                    hx-delete="{% url 'tasks:comment_delete' comment.id %}"

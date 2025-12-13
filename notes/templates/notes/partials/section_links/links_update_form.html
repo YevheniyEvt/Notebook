@@ -1,21 +1,6 @@
 {% load crispy_forms_tags %}
-<div class="border border-primary p-2 mb-3 rounded-3" id="link-update">
+<div class="border border-primary p-2 mb-3 rounded-3">
     {% crispy form %}
-    <button class="btn btn-primary btn-sm"
-          hx-post="{% url 'notes:link_update' form.instance.id %}"
-          hx-include="#hx-section-link-form"
-          hx-target="#link-update"
-    >
-      Update
-    </button>
-    <button class="btn btn-secondary btn-sm"
-            hx-get="{% url 'notes:link_list'  form.instance.section.id %}"
-            hx-target="#link-{{ form.instance.id  }}"
-            hx-select="#link-{{ form.instance.id  }}"
-            hx-swap="outerHTML"
-    >
-      Cancel
-    </button>
 </div>
 
 

@@ -1,10 +1,10 @@
 import cloudinary
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionImageForm, SectionImageUpdateForm
+from notes.forms import SectionImageCreateForm, SectionImageUpdateForm
 from notes.models import Image, Section
 
 __all__ = [
@@ -30,7 +30,7 @@ class SectionImageListView(ListView):
 
 class SectionImageCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Image
-    form_class = SectionImageForm
+    form_class = SectionImageCreateForm
     template_name = 'notes/partials/section_image/image_form.html'
     htmx_client_events = ['rerenderImageList']
 

@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
-from notes.forms import SectionLinksForm
+from notes.forms import SectionLinksCreateForm, SectionLinksUpdateForm
 from notes.models import Links, Section
 
 __all__ = [
@@ -30,7 +30,7 @@ class SectionLinksListView(ListView):
 
 class SectionLinksCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Links
-    form_class = SectionLinksForm
+    form_class = SectionLinksCreateForm
     template_name = 'notes/partials/section_links/links_form.html'
     htmx_client_events = ['rerenderLinksList']
 
@@ -43,15 +43,15 @@ class SectionLinksCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
         messages.success(self.request, 'Links added.')
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['section'] = Section.objects.get(id=self.kwargs['pk'])
-        return context
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['section_id'] = self.kwargs['pk']
+        return kwargs
 
 
 class SectionLinksUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     model = Links
-    form_class = SectionLinksForm
+    form_class = SectionLinksUpdateForm
     template_name = 'notes/partials/section_links/links_update_form.html'
     htmx_client_events = ['rerenderLinksList']
 
