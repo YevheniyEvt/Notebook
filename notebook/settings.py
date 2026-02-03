@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "tasks.apps.TasksConfig",
     "daybook.apps.DaybookConfig",
     "notes.apps.NotesConfig",
+    "agent.apps.AgentConfig",
 ]
 
 MIDDLEWARE = [
