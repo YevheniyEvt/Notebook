@@ -15,6 +15,7 @@ class Task(models.Model):
         COMPLETED = 'completed', 'Completed'
         IN_PROGRESS = 'in_progress', 'Active'
         CANCELED = 'canceled', 'Canceled'
+        IS_PLANNED = 'is_planned', 'Planned'
 
     title = models.CharField(max_length=100)
     description = models.TextField()

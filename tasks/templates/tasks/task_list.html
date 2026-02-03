@@ -119,6 +119,23 @@
                         All
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link"
+                            id="planned-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#planned"
+                            type="button" role="tab"
+                            aria-controls="planned"
+                            aria-selected="false"
+                            hx-trigger="click, rerenderTaskTable from:body"
+                            hx-get="{% url 'tasks:task_list' %}?status=is_planned"
+                            hx-target="#planned"
+                            hx-select=".table-container"
+                            x-on:click="active_tab='planned'; task_status='is_planned'"
+                    >
+                        Planned
+                    </button>
+                </li>
             </ul>
             <div class="tab-content" id="tasksContent">
                 <div class="tab-pane fade show active" id="in_progress" role="tabpanel" aria-labelledby="in_progress-tab">
@@ -131,7 +148,10 @@
                     <!-- HTMX will inject content here -->
                 </div>
                 <div class="tab-pane fade" id="all-tasks" role="tabpanel" aria-labelledby="all-tasks-tab">
-
+                    <!-- HTMX will inject content here -->
+                </div>
+                <div class="tab-pane fade" id="planned" role="tabpanel" aria-labelledby="planned-tab">
+                    <!-- HTMX will inject content here -->
                 </div>
             </div>
         </div>

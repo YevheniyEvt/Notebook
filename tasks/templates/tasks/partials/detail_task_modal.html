@@ -59,5 +59,10 @@
             Open task
         </button>
     {% endif %}
+        <button type="button"
+                class="btn btn-outline-info rounded-pill btn-sm"
+                hx-post="{% url 'tasks:task_planned' task.id %}">
+            Planned task
+        </button>
   </div>
 </div>
