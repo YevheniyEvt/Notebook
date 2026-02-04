@@ -1,0 +1,22 @@
+
+.chat-container {
+    height: calc(100vh - 80px);
+}
+
+.contacts-list {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.chat-messages {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+}
+
+.message {
+    max-width: 75%;
+}
+
+.message-input {
+    border-top: 1px solid #dee2e6;
+}

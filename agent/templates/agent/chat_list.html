@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static partials %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'agent/chat_list.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+<div class="container-fluid chat-container"
+     id="chatbot"
+     hx-get="{% url 'chatbot:chat_list' %}"
+     hx-trigger="rerenderChat from:body"
+
+>
+{% partialdef chatbot inline %}
+    <div class="row h-100">
+        <!-- Chats Sidebar -->
+        <div class="col-md-3 col-12 border-end p-0">
+            <div class="contacts-list p-3">
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Search...">
+                </div>
+                <div class="list-group">
+                    <button class="btn btn-primary mb-2" hx-post="{% url 'chatbot:chat_create' %}"> New chat </button>
+                    {% for chat in chats %}
+                        <div class="d-flex">
+                            <a href="#"
+                               class="list-group-item list-group-item-action chat-item {% if chats.0.id == chat.id %} active {% endif %}"
+                               hx-get="{% url 'chatbot:chat_detail' chat.id %}"
+                               hx-target="#chat-detail"
+                            >
+                                <div class="d-flex w-100 justify-content-between">
+                                    <small>{{ chat.start_date }}</small>
+                                </div>
+                                <p class="mb-1">{{ chat }}</p>
+                            </a>
+                            <div class="btn-group">
+                              <button type="button" class="btn border" data-bs-toggle="dropdown" aria-expanded="false">
+                                ...
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       hx-delete="{% url 'chatbot:chat_delete' chat.id %}"
+                                       hx-confirm="Delete chat?"
+                                    >
+                                        <i class="bi bi-trash text-danger"></i>
+                                        Delete
+                                    </a>
+                                </li>
+                              </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+    {% if chats %}
+        <div class="col-md-9 col-12 p-0 d-flex flex-column"
+             id="chat-detail"
+             hx-get="{% url 'chatbot:chat_detail' chats.0.id %}"
+             hx-trigger="load once, rerenderMessages from:body"
+        >
+
+        </div>
+    {% endif %}
+    </div>
+{% endpartialdef chatbot %}
+</div>
+
+<script>
+document.addEventListener('click', function (e) {
+    const item = e.target.closest('.chat-item')
+    if (!item) return
+
+    document.querySelectorAll('.chat-item.active')
+        .forEach(el => el.classList.remove('active'))
+
+    item.classList.add('active')
+})
+</script>
+
+{% endblock content %}

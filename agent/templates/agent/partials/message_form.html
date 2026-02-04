@@ -1,0 +1,9 @@
+{% load crispy_forms_tags %}
+
+{% crispy form %}
+ <button class="btn btn-primary"
+         hx-post="{% url 'chatbot:messages_create' form.chat_id %}"
+         hx-include="#hx-message-form"
+ >
+    <i class="bi bi-send"></i> Send
+</button>

@@ -27,4 +27,5 @@ urlpatterns = [
     path("tasks/", include("tasks.urls", namespace="tasks")),
     path("daybook/", include("daybook.urls", namespace="daybook")),
     path("notes/", include("notes.urls", namespace="notes")),
+    path("chatbot/", include("agent.urls", namespace="chatbot")),
 ]
