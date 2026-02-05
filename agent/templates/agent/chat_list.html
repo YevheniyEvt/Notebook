@@ -19,7 +19,14 @@
         <div class="col-md-3 col-12 border-end p-0">
             <div class="contacts-list p-3">
                 <div class="mb-3">
-                    <input type="text" class="form-control" placeholder="Search...">
+                    <form
+                        hx-trigger="search, keyup delay:300ms changed"
+                        hx-target="#chatbot"
+                        hx-get="{% url 'chatbot:chat_list' %}"
+                        hx-include="[name=search],">
+
+                        <input type="text" name="search" class="form-control" placeholder="Search..." {% if search %} value="{{ search }}" {% endif %}>
+                    </form>
                 </div>
                 <div class="list-group">
                     <button class="btn btn-primary mb-2" hx-post="{% url 'chatbot:chat_create' %}"> New chat </button>

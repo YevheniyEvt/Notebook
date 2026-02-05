@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.generic import DetailView, CreateView, ListView, DeleteView
+from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 
+from agent.filter import ChatFilter
 from agent.forms import MessageCreateForm
 from agent.models import Message, Chat
 from agent.utils import llm_response_generator
@@ -37,8 +39,9 @@ class ChatDetailView(LoginRequiredMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class ChatListView(LoginRequiredMixin, ListView):
+class ChatListView(LoginRequiredMixin, FilterView, ListView):
     model = Chat
+    filterset_class = ChatFilter
     template_name = 'agent/chat_list.html'
     context_object_name = 'chats'
 
@@ -49,6 +52,12 @@ class ChatListView(LoginRequiredMixin, ListView):
         if self.request.htmx:
             return self.template_name + '#chatbot'
         return self.template_name
+
+    def get_context_data(self, **kwargs):
+        search = self.request.GET.get('search')
+        ctx = super().get_context_data()
+        ctx['search'] = search
+        return ctx
 
 
 class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMixin, CreateView):
