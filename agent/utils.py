@@ -1,10 +1,18 @@
+from langchain_core.messages import AIMessage, HumanMessage
 from agent.developer_chatbot.chatbot import graph as chatbot
 from agent.models import Message
 
 def llm_response_generator(chat):
-    messages = Message.objects.filter(chat=chat)[:8]
-    messages_content = [message.content for message in messages]
-    llm_answer = chatbot.invoke({"role": "user", "messages": messages_content})
+    # Get last 8 messages and reverse it for right order for LLM
+    messages = list(Message.objects.filter(chat=chat).order_by('-created_at')[:8][::-1])
+    messages_content = [
+        HumanMessage(content=message.content)
+        if message.is_user_message
+        else AIMessage(content=message.content)
+        for message in messages
+    ]
+
+    llm_answer = chatbot.invoke({'messages': messages_content})
     return llm_answer
 
     # for message_chunk, metadata in stream:

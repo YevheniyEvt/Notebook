@@ -1,9 +1,20 @@
 {% load crispy_forms_tags %}
 
+
 {% crispy form %}
- <button class="btn btn-primary"
+ <button class="btn btn-primary" id="send-btn"
          hx-post="{% url 'chatbot:messages_create' form.chat_id %}"
          hx-include="#hx-message-form"
+         hx-indicator="#spinner"
+         hx-target="#message-form"
+         hx-on:htmx:before-request="this.hidden = true"
+         hx-on:htmx:after-request=" this.hidden = false"
  >
     <i class="bi bi-send"></i> Send
 </button>
+
+<button id="spinner"  class="btn btn-primary htmx-indicator" type="button" disabled>
+  <span class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
+  <span role="status">Loading...</span>
+</button>
+

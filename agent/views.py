@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-
 from django.views.generic import DetailView, CreateView, ListView, DeleteView
 from django_htmx.http import trigger_client_event
 
@@ -64,18 +63,20 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
     def form_valid(self, form):
         chat = Chat.objects.get(pk=self.kwargs['pk'])
         if not chat.name:
-            chat.name = f'{form.cleaned_data['content'][:30]}'
+            chat.name = f"{form.cleaned_data['content'][:30]}"
             chat.save()
             self.htmx_client_events = ['rerenderChat',]
         form.instance.chat_id = self.kwargs['pk']
         form.instance.user = self.request.user
         form.instance.is_user_message = True
         form.save()
+
         llm_response = llm_response_generator(chat)
+        llm_answer = llm_response['messages'][-1].content
         Message.objects.create(
             chat=chat,
             user=self.request.user,
             is_ai_message=True,
-            content=llm_response,
+            content=llm_answer,
         )
         return super().form_valid(form)

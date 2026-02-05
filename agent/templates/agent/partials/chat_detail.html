@@ -3,7 +3,7 @@
         {% if message.is_ai_message %}
             <div class="message mb-3 align-self-start">
                 <div class="bg-light rounded p-2">
-                    <strong>Ai:</strong> {{ message.content }}
+                    <strong>Ai:</strong> {{ message.html_content|safe }}
                 </div>
                 <small class="text-muted">{{ message.created_at }}</small>
             </div>
@@ -19,6 +19,7 @@
 </div>
 
 <div class="message-input p-3"
+     id="message-form"
      hx-get="{% url 'chatbot:messages_create' chat.id %}"
      hx-trigger="load once"
 >
