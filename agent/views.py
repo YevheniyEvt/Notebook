@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
+from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, CreateView, ListView, DeleteView
 from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
@@ -7,7 +8,7 @@ from django_htmx.http import trigger_client_event
 from agent.filter import ChatFilter
 from agent.forms import MessageCreateForm
 from agent.models import Message, Chat
-from agent.utils import llm_response_generator
+from agent.utils import generate_llm_response
 from mixins.view import PkInFormKwargsMixin, HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
@@ -80,7 +81,7 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
         form.instance.is_user_message = True
         form.save()
 
-        llm_response = llm_response_generator(chat)
+        llm_response = generate_llm_response(chat)
         llm_answer = llm_response['messages'][-1].content
         Message.objects.create(
             chat=chat,
@@ -89,3 +90,10 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
             content=llm_answer,
         )
         return super().form_valid(form)
+
+
+def chat_stream(request, pk):
+    chat = get_object_or_404(Chat, pk=pk, user=request.user)
+
+    return StreamingHttpResponse(generate_llm_response(chat, stream=True),
+                                 content_type='text/event-stream')

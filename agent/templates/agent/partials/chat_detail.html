@@ -16,6 +16,17 @@
             </div>
         {% endif %}
     {% endfor %}
+
+
+{#    <div id="chat-stream-{{ chat.id }}"#}
+{#         hx-ext="sse"#}
+{#         sse-connect="{% url 'chatbot:chat_stream' chat.id %}"#}
+{#         sse-swap="message"#}
+{#         hx-swap="beforeend"#}
+{#        hx-trigger="refresh"#}
+{#    >#}
+{#    </div>#}
+
 </div>
 
 <div class="message-input p-3"
@@ -25,4 +36,3 @@
 >
 
 </div>
-

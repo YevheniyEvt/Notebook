@@ -6,6 +6,7 @@ from agent.views import (
     MessageCreateView,
     ChatListView,
     ChatDeleteView,
+    chat_stream,
 )
 
 app_name = "chatbot"
@@ -15,6 +16,8 @@ urlpatterns = [
     path("chat/create/", ChatCreateView.as_view(), name="chat_create"),
     path("chat/<int:pk>/", ChatDetailView.as_view(), name="chat_detail"),
     path("chat/<int:pk>/delete", ChatDeleteView.as_view(), name="chat_delete"),
+
+    path('chat/<int:pk>/stream/', chat_stream, name='chat_stream'),
 
     path("chat/<int:pk>/message/create/", MessageCreateView.as_view(), name="messages_create"),
 ]
