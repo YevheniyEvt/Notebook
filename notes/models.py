@@ -37,7 +37,7 @@ class Topic(models.Model):
         ordering = ['-created_at']
 
     def get_absolute_url(self):
-        return reverse('notes:topic_detail', kwargs={'pk': self.pk})
+        return reverse('notes:sections_list', kwargs={'pk': self.pk})
 
     def get_update_url(self, **kwargs):
         return reverse('notes:topic_update', kwargs={'pk': self.id})
@@ -74,7 +74,7 @@ class Section(models.Model):
 
     @classmethod
     def get_hx_rerender_url(cls, **kwargs):
-        return reverse('notes:topic_detail', kwargs={'pk': kwargs['related_instance_id']})
+        return reverse('notes:sections_list', kwargs={'pk': kwargs['related_instance_id']})
 
 
 class Code(models.Model):

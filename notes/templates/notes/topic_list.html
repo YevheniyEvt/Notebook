@@ -38,6 +38,10 @@
         class="form-control"
         placeholder="Search..."
         aria-label="Search"
+        hx-trigger="search, keyup delay:200ms changed"
+        hx-target="#topics-list"
+        hx-swap="innerHTML"
+        hx-get="{{ request.path }}"
       />
     </form>
   </div>
@@ -45,6 +49,7 @@
 
 <div class="container">
     <div class="row g-4"
+         id="topics-list"
          hx-get="{% url 'notes:topic_list' %}"
          hx-taget="this"
          hx-swap="innerHTML"

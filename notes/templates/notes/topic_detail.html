@@ -39,6 +39,10 @@
         class="form-control"
         placeholder="Search..."
         aria-label="Search"
+        hx-trigger="search, keyup delay:200ms changed"
+        hx-target="#topic-detail"
+        hx-swap="innerHTML"
+        hx-get="{{ request.path }}"
       />
     </form>
   </div>
@@ -52,7 +56,8 @@
         </div>
     </div>
     <div class="row g-4"
-         hx-get="{% url 'notes:topic_detail' topic.id %}"
+         id="topic-detail"
+         hx-get="{% url 'notes:sections_list' topic.id %}"
          hx-taget="this"
          hx-swap="innerHTML"
          hx-trigger="rerenderSectionList from:body"
@@ -74,7 +79,7 @@
                     </div>
                 </a>
             </div>
-            {% for section in topic.sections.all %}
+            {% for section in sections %}
             <div class="col-md-4" id="section-{{ section.id }}">
                 <a href="{{ section.get_absolute_url }}" style="text-decoration: none">
                     <div class="service-card h-100 p-4  position-relative">

@@ -1,22 +1,24 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django_filters.views import FilterView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
+from notes.filter import SectionTopicFilter
 from notes.forms import TopicCreateHTMXForm, TopicUpdateHTMXForm
 from notes.models import Topic
 
 __all__ = [
     'TopicListView',
-    'TopicDetail',
     'TopicCreateView',
     'TopicUpdateView',
     'TopicDeleteView',
 ]
 
 
-class TopicListView(LoginRequiredMixin, ListView):
+class TopicListView(LoginRequiredMixin, FilterView, ListView):
     model = Topic
+    filterset_class = SectionTopicFilter
     context_object_name = 'topics'
     template_name = 'notes/topic_list.html'
 
@@ -28,19 +30,6 @@ class TopicListView(LoginRequiredMixin, ListView):
             return self.template_name + '#topic-list'
         return self.template_name
 
-
-class TopicDetail(LoginRequiredMixin, DetailView):
-    model = Topic
-    context_object_name = 'topic'
-    template_name = 'notes/topic_detail.html'
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
-
-    def get_template_names(self):
-        if self.request.htmx:
-            return self.template_name + '#sections'
-        return self.template_name
 
 class TopicCreateView(LoginRequiredMixin, HTMXViewFormMixin, CreateView):
     model = Topic
