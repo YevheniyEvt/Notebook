@@ -21,3 +21,11 @@ Your task will be:
 
 ROUTER_PROMPT = """Analyze a question, make decision is it about programming or not. Route the input to programming if topic of user`s question is about programming, coding, Python, Django framework, CSS, HTML, Bootstrap or your answer is going to be about programming, codding ect.
 Route the input to general if user`s question is general topic and your answer is not going to be about programming, codding ect. Always make priority to programming answer"""
+
+META_DATA_ROUTER = """If in messages there is only one user/human message return True to generate_chat_name, if there are more than one human message return False"""
+
+GENERATE_NAME_FOR_CHAT_PROMPT = """
+If you have only one message from user, so it is first message. Analyze a message and come up with a name for chat with this message.
+The name should be no longer than 15 characters and after reading it it should be clear what the conversation in this chat is about.
+Do not return any another answer ONLY NAME FOR CHAT!
+"""

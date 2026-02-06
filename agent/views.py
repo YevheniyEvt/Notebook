@@ -71,11 +71,7 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
         return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
-        chat = Chat.objects.get(pk=self.kwargs['pk'])
-        if not chat.name:
-            chat.name = f"{form.cleaned_data['content'][:30]}"
-            chat.save()
-            self.htmx_client_events = ['rerenderChat',]
+        chat = get_object_or_404(Chat, pk=self.kwargs['pk'])
         form.instance.chat_id = self.kwargs['pk']
         form.instance.user = self.request.user
         form.instance.is_user_message = True
@@ -89,6 +85,11 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
             is_ai_message=True,
             content=llm_answer,
         )
+
+        if not chat.name and llm_response['chat_name']:
+            chat.name = llm_response['chat_name']
+            chat.save()
+            self.htmx_client_events = ['rerenderChat',]
         return super().form_valid(form)
 
 
