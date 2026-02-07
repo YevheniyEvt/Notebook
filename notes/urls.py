@@ -15,6 +15,7 @@ urlpatterns = [
     path("topic/<int:pk>/sections/", views.SectionListView.as_view(), name="sections_list"),
     path("section/<int:pk>/", views.SectionDetail.as_view(), name="section_detail"),
     path("section/<int:pk>/update/", views.SectionUpdateView.as_view(), name="section_update"),
+    path("section/<int:pk>/change-topic/", views.SectionChangeTopicView.as_view(), name="section_change_topic"),
     path("section/<int:pk>/delete/", views.SectionDeleteView.as_view(), name="section_delete"),
 
 

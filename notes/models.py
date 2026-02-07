@@ -36,6 +36,9 @@ class Topic(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    def __str__(self):
+        return self.title
+
     def get_absolute_url(self):
         return reverse('notes:sections_list', kwargs={'pk': self.pk})
 

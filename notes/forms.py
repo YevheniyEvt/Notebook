@@ -123,6 +123,12 @@ class SectionUpdateHTMXForm(BaseTopicSectionHTMXForm):
     class Meta(BaseTopicSectionHTMXForm.Meta):
         model = Section
 
+class SectionChangeTopicHTMXForm(BaseNoteHTMXForm):
+    topic = forms.ModelChoiceField(Topic.objects.all())
+    class Meta:
+        model = Section
+        fields = ('topic',)
+
 
 class SectionCodeCreateHTMXForm(BaseNoteHTMXForm):
     class Meta:

@@ -90,6 +90,13 @@
                         {% if section.description  %}<p class="service-text text-center mb-0">{{ section.description }}</p>{% endif %}
                         <div class=" position-absolute end-0 bottom-0 mb-2 me-2 d-flex gap-2">
                             <span
+                               hx-get="{% url 'notes:section_change_topic' section.id %}"
+                               hx-swap="innerHTML"
+                               hx-target="#section-{{ section.id }}"
+                            >
+                              <i class="bi bi-file-arrow-up text-primary"></i>
+                            </span>
+                            <span
                                hx-get="{% url 'notes:section_update' section.id %}"
                                hx-swap="innerHTML"
                                hx-target="#section-{{ section.id }}"

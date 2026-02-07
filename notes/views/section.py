@@ -8,7 +8,7 @@ from django_filters.views import FilterView
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 from mixins.view import PkInFormKwargsMixin
 from notes.filter import SectionFilter
-from notes.forms import SectionCreateHTMXForm, SectionUpdateHTMXForm
+from notes.forms import SectionCreateHTMXForm, SectionUpdateHTMXForm, SectionChangeTopicHTMXForm
 from notes.models import Section, Topic
 
 __all__ = [
@@ -17,6 +17,7 @@ __all__ = [
     'SectionUpdateView',
     'SectionDeleteView',
     'SectionListView',
+    'SectionChangeTopicView',
 ]
 
 class SectionListView(LoginRequiredMixin, FilterView, ListView):
@@ -69,6 +70,11 @@ class SectionUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
     htmx_client_events = ['rerenderSectionList']
     template_name = 'notes/partials/section_update_form.html'
 
+    def post(self, request, *args, **kwargs):
+        if self.request.POST.get('topic'):
+            self.form_class = SectionChangeTopicHTMXForm
+        return super().post(request, *args, **kwargs)
+
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
@@ -80,6 +86,11 @@ class SectionUpdateView(LoginRequiredMixin, HTMXViewFormMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['related_instance_id'] = self.object.topic_id
         return kwargs
+
+
+class SectionChangeTopicView(SectionUpdateView):
+    http_method_names = ['get']
+    form_class = SectionChangeTopicHTMXForm
 
 class SectionDeleteView(LoginRequiredMixin, HTMXDeleteViewMixin, DeleteView):
     model = Section
