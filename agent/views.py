@@ -78,7 +78,7 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
 
         llm_response = chat.generate_and_save_llm_response()
 
-        chat_name_from_llm = llm_response['chat_name']
+        chat_name_from_llm = llm_response.get('chat_name', None)
         if not chat.name and chat_name_from_llm:
             chat.name = chat_name_from_llm
             chat.save()
@@ -90,5 +90,5 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
 def chat_stream(request, pk):
     chat = get_object_or_404(Chat, pk=pk, user=request.user)
 
-    return StreamingHttpResponse(generate_llm_response(chat, stream=True),
+    return StreamingHttpResponse(chat.generate_stream_response_from_llm(),
                                  content_type='text/event-stream')
