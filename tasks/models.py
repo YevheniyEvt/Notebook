@@ -2,13 +2,15 @@ from datetime import date
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
+
+from tasks.manager import TaskManager
 
 __all__ = [
     'Task',
     'TaskComment',
 ]
 
-from django.urls import reverse
 
 class Task(models.Model):
     class Status(models.TextChoices):
@@ -23,6 +25,8 @@ class Task(models.Model):
     end_date = models.DateField(default=date.today)
     status = models.CharField(choices=Status.choices, default=Status.IN_PROGRESS)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    objects = TaskManager()
 
     class Meta:
         ordering = ('end_date',)
@@ -48,6 +52,7 @@ class Task(models.Model):
     @property
     def is_terminated(self):
         return self.end_date < date.today()
+
 
     @property
     def can_be_completed(self):

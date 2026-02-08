@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "daybook.apps.DaybookConfig",
     "notes.apps.NotesConfig",
     "agent.apps.AgentConfig",
+    "home.apps.HomeConfig",
 ]
 
 MIDDLEWARE = [
@@ -165,7 +166,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-LOGIN_REDIRECT_URL = reverse_lazy("index")
+LOGIN_REDIRECT_URL = reverse_lazy("home:index")
 LOGOUT_REDIRECT_URL = reverse_lazy("account_login")
 
 MESSAGE_TAGS = {

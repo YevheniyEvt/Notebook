@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'notes/style.css' %}">
+{% endblock css %}
+
+{% block content %}
+  <div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Today tasks</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    {% if tasks_with_today_deadline %}
+        {% for task in tasks_with_today_deadline %}
+          <div class="feature col">
+            <h3 class="fs-2 text-body-emphasis">{{ task.title }}</h3>
+            <p>
+              {{ task.description }}
+            </p>
+            <a href="#"
+               class="icon-link"
+               data-bs-toggle="modal"
+               data-bs-target="#detailTaskModal"
+               hx-get="{% url 'tasks:task_detail' task.id %}"
+               hx-target="#detailTaskModalDialog"
+            >
+              Detail
+              <svg class="bi" aria-hidden="true">
+                <use xlink:href="#chevron-right"></use>
+              </svg>
+            </a>
+          </div>
+        {% endfor %}
+    {% else %}
+        No tasks for today
+    {% endif %}
+    </div>
+  </div>
+
+  <div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Terminated tasks</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    {% if terminated_tasks %}
+        {% for task in terminated_tasks %}
+          <div class="feature col">
+            <h3 class="fs-2 text-danger">{{ task.title }}</h3>
+            <p class="text-danger">
+              {{ task.description }}
+            </p>
+            <a href="#"
+               class="icon-link"
+               data-bs-toggle="modal"
+               data-bs-target="#detailTaskModal"
+               hx-get="{% url 'tasks:task_detail' task.id %}"
+               hx-target="#detailTaskModalDialog"
+            >
+              Detail
+              <svg class="bi" aria-hidden="true">
+                <use xlink:href="#chevron-right"></use>
+              </svg>
+            </a>
+          </div>
+        {% endfor %}
+    {% else %}
+        NO terminated tasks
+    {% endif %}
+    </div>
+  </div>
+
+  <div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">Last created notes</h2>
+    <div class="row g-4" id="topics-list">
+    {% for topic in topics %}
+        <div class="col-md-4" id="topic-{{ topic.id }}">
+            <a href="{{ topic.get_absolute_url }}" style="text-decoration: none">
+                <div class="service-card h-100 p-4 position-relative">
+                    <div class="icon-wrapper mb-4">
+                        <i class="bi bi-{{ topic.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                    </div>
+                    <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
+                    <p class="service-text text-center mb-0">{% if topic.description  %}{{ topic.description }}{% endif %}</p>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+  </div>
+{% endblock content %}
