@@ -67,21 +67,25 @@
   </div>
 
   <div class="container px-4 py-5">
-    <h2 class="pb-2 border-bottom">Last created notes</h2>
+    <h2 class="pb-2 border-bottom">Last visited notes</h2>
     <div class="row g-4" id="topics-list">
-    {% for topic in topics %}
-        <div class="col-md-4" id="topic-{{ topic.id }}">
-            <a href="{{ topic.get_absolute_url }}" style="text-decoration: none">
-                <div class="service-card h-100 p-4 position-relative">
-                    <div class="icon-wrapper mb-4">
-                        <i class="bi bi-{{ topic.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+    {% if topics %}
+        {% for topic in topics %}
+            <div class="col-md-4" id="topic-{{ topic.id }}">
+                <a href="{{ topic.get_absolute_url }}" style="text-decoration: none">
+                    <div class="service-card h-100 p-4 position-relative">
+                        <div class="icon-wrapper mb-4">
+                            <i class="bi bi-{{ topic.bootstrap_icon_name }}" style="font-size: 2rem; color: whitesmoke;"></i>
+                        </div>
+                        <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
+                        <p class="service-text text-center mb-0">{% if topic.description  %}{{ topic.description }}{% endif %}</p>
                     </div>
-                    <h4 class="service-title text-center mb-3">{{ topic.title }}</h4>
-                    <p class="service-text text-center mb-0">{% if topic.description  %}{{ topic.description }}{% endif %}</p>
-                </div>
-            </a>
-        </div>
-    {% endfor %}
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="mt-4">No visited topics</p>
+    {% endif %}
     </div>
   </div>
 {% endblock content %}

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import cloudinary
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,13 +28,18 @@ class SectionListView(LoginRequiredMixin, FilterView, ListView):
     context_object_name = 'sections'
     template_name = 'notes/topic_detail.html'
 
+    def get(self, request, *args, **kwargs):
+        self.topic = get_object_or_404(Topic, pk=self.kwargs['pk'])
+        self.topic.last_visited_at = datetime.now()
+        self.topic.save()
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user, topic_id=self.kwargs['pk'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        topic = get_object_or_404(Topic, pk=self.kwargs['pk'])
-        context['topic'] = topic
+        context['topic'] = self.topic
         return context
 
     def get_template_names(self):

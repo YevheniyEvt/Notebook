@@ -9,6 +9,7 @@ from django.utils.text import slugify
 
 from cloudinary.models import CloudinaryField
 
+from mixins.models import LastVisitedMixin
 
 DEFAULT_BOOTSTRAP_ICON_NAME = ['calendar2', 'clipboard', 'cpu', 'database', 'file-richtext-fill', 'floppy']
 
@@ -23,7 +24,7 @@ def get_public_id_prefix(instance):
 def get_random_icon():
     return random.choice(DEFAULT_BOOTSTRAP_ICON_NAME)
 
-class Topic(models.Model):
+class Topic(LastVisitedMixin, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(
         max_length=200,
@@ -54,7 +55,7 @@ class Topic(models.Model):
         return reverse('notes:topic_list')
 
 
-class Section(models.Model):
+class Section(LastVisitedMixin, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='sections')
     title = models.CharField(max_length=150)
