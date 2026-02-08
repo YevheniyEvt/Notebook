@@ -8,7 +8,6 @@ from django_htmx.http import trigger_client_event
 from agent.filter import ChatFilter
 from agent.forms import MessageCreateForm
 from agent.models import Message, Chat
-from agent.utils import generate_llm_response
 from mixins.view import PkInFormKwargsMixin, HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
@@ -71,25 +70,20 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
         return super().get_queryset().filter(user=self.request.user)
 
     def form_valid(self, form):
-        chat = get_object_or_404(Chat, pk=self.kwargs['pk'])
+        chat = get_object_or_404(Chat, pk=self.kwargs['pk'], user=self.request.user)
         form.instance.chat_id = self.kwargs['pk']
         form.instance.user = self.request.user
         form.instance.is_user_message = True
         form.save()
 
-        llm_response = generate_llm_response(chat)
-        llm_answer = llm_response['messages'][-1].content
-        Message.objects.create(
-            chat=chat,
-            user=self.request.user,
-            is_ai_message=True,
-            content=llm_answer,
-        )
+        llm_response = chat.generate_and_save_llm_response()
 
-        if not chat.name and llm_response['chat_name']:
-            chat.name = llm_response['chat_name']
+        chat_name_from_llm = llm_response['chat_name']
+        if not chat.name and chat_name_from_llm:
+            chat.name = chat_name_from_llm
             chat.save()
             self.htmx_client_events = ['rerenderChat',]
+
         return super().form_valid(form)
 
 
