@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class TopicListView(LoginRequiredMixin, FilterView, ListView):
+class TopicListView(LoginRequiredMixin, FilterView):
     model = Topic
     filterset_class = SectionTopicFilter
     context_object_name = 'topics'

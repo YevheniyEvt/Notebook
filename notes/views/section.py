@@ -4,7 +4,7 @@ import cloudinary
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
@@ -22,7 +22,7 @@ __all__ = [
     'SectionChangeTopicView',
 ]
 
-class SectionListView(LoginRequiredMixin, FilterView, ListView):
+class SectionListView(LoginRequiredMixin, FilterView):
     model = Section
     filterset_class = SectionFilter
     context_object_name = 'sections'

@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, CreateView, ListView, DeleteView
+from django.views.generic import DetailView, CreateView, DeleteView
 from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 
@@ -39,7 +39,7 @@ class ChatDetailView(LoginRequiredMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class ChatListView(LoginRequiredMixin, FilterView, ListView):
+class ChatListView(LoginRequiredMixin, FilterView):
     model = Chat
     filterset_class = ChatFilter
     template_name = 'agent/chat_list.html'

@@ -1,10 +1,11 @@
-from django.views.generic import TemplateView, ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
 
 from tasks.models import Task
 from notes.models import Topic
 
 
-class HomeView(TemplateView):
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home/index.html'
 
     def get_context_data(self, **kwargs):
