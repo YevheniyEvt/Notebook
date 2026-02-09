@@ -1,6 +1,7 @@
 
 # 🧠 Personal Productivity App (Django + HTMX + AI)
 A full-stack Django application for personal productivity that combines task management, daily journaling, structured notes, and an AI assistant in a single system.
+
 This project was built as a pet project for learning and demonstrating real-world Django architecture, modern server-driven UI with HTMX, and practical AI integration using LangGraph and the OpenAI API.
 
 
@@ -18,7 +19,7 @@ A flexible task management system focused on clarity and workflow.
   - All
 - Independent search for each status tab
 - Designed to keep scheduled tasks separate from deadlines
-- 
+
 <details>
   <summary>Screenshot</summary>
   <img width="1516" height="663" alt="Screenshot from 2026-02-09 17-48-10" src="https://github.com/user-attachments/assets/96de6471-80a2-458e-b934-34e160a5416f" />
@@ -72,7 +73,7 @@ An AI-powered assistant integrated directly into the application.
   <img width="1380" height="920" src="https://github.com/user-attachments/assets/ddf530d3-eca6-4fe3-a837-a177579a584c" />
 </details>
 
-## 🧩 Technical Overview
+# 🧩 Technical Overview
 ### Backend
 - Django
 - Django models for persistent AI chat history
@@ -97,9 +98,10 @@ An AI-powered assistant integrated directly into the application.
 - markdown
 - cloudinary
 
-## 🎯 Project Goals
+# 🎯 Project Goals
 - Practice building a production-like Django application
 - Explore modern server-driven UI patterns
 - Integrate AI features in a realistic way
 - Demonstrate understanding of backend architecture, data modeling, and UX decisions
+
 
