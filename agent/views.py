@@ -1,12 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, StreamingHttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import DetailView, CreateView, DeleteView
 from django_filters.views import FilterView
 from django_htmx.http import trigger_client_event
 
 from agent.filter import ChatFilter
-from agent.forms import MessageCreateForm
+from agent.forms import MessageCreateForm, WsMessageCreateForm
 from agent.models import Message, Chat
 from mixins.view import PkInFormKwargsMixin, HTMXViewFormMixin, HTMXDeleteViewMixin
 
@@ -87,8 +87,13 @@ class MessageCreateView(LoginRequiredMixin, PkInFormKwargsMixin, HTMXViewFormMix
         return super().form_valid(form)
 
 
-def chat_stream(request, pk):
-    chat = get_object_or_404(Chat, pk=pk, user=request.user)
+# def chat_stream(request, pk):
+#     chat = get_object_or_404(Chat, pk=pk, user=request.user)
+#
+#     return StreamingHttpResponse(chat.generate_stream_response_from_llm(),
+#                                  content_type='text/event-stream')
 
-    return StreamingHttpResponse(chat.generate_stream_response_from_llm(),
-                                 content_type='text/event-stream')
+
+def get_ws_message_form(request, pk):
+    return render(request, 'agent/partials/ws_message_form.html', {'form': WsMessageCreateForm()
+    })

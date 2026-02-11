@@ -1,5 +1,9 @@
-<div class="chat-messages p-3">
-    {% for message in chat.messages.all %}
+
+<div hx-ext="ws"
+     ws-connect="/ws/chat/{{ chat.id }}/"
+>
+    <div class="chat-messages p-3" id="chat-log" >
+        {% for message in chat.messages.all %}
         {% if message.is_ai_message %}
             <div class="message mb-3 align-self-start">
                 <div class="bg-light rounded p-2">
@@ -16,23 +20,12 @@
             </div>
         {% endif %}
     {% endfor %}
+    </div>
 
-
-{#    <div id="chat-stream-{{ chat.id }}"#}
-{#         hx-ext="sse"#}
-{#         sse-connect="{% url 'chatbot:chat_stream' chat.id %}"#}
-{#         sse-swap="message"#}
-{#         hx-swap="beforeend"#}
-{#        hx-trigger="refresh"#}
-{#    >#}
-{#    </div>#}
-
-</div>
-
-<div class="message-input p-3"
-     id="message-form"
-     hx-get="{% url 'chatbot:messages_create' chat.id %}"
-     hx-trigger="load once"
->
-
+    <div class="message-input p-3">
+        <form ws-send>
+            <textarea name="message" cols="40" rows="10" class="textarea form-control" required="" id="id_text"></textarea>
+            <button type="submit" class="btn btn-primary mt-2">Send</button>
+        </form>
+    </div>
 </div>

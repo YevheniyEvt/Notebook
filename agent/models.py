@@ -2,6 +2,7 @@ from collections.abc import Generator
 
 import markdown
 import bleach
+from asgiref.sync import sync_to_async
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -33,24 +34,19 @@ class Chat(models.Model):
             if message_chunk.content:
                 yield message_chunk.content
 
-    def generate_and_save_llm_response(self) -> dict:
-        llm_response = self._send_messages_and_get_response_from_llm()
-
+    async def generate_and_save_llm_response(self) -> dict:
+        llm_response = await self._send_messages_and_get_response_from_llm()
         # get last message in list - it is last answer from LLM
         llm_message_content = llm_response['messages'][-1].content
-        Message.objects.create(
-            chat=self,
-            user=self.user,
-            is_ai_message=True,
-            content=llm_message_content,
-        )
+        await self._save_ai_message(llm_message_content)
         return llm_response
 
-    def _send_messages_and_get_response_from_llm(self) -> dict:
-        messages_content = self._get_messages_for_llm()
-        llm_response = chatbot.invoke({'messages': messages_content})
+    async def _send_messages_and_get_response_from_llm(self) -> dict:
+        messages_content = await self._get_messages_for_llm()
+        llm_response = await chatbot.ainvoke({'messages': messages_content})
         return llm_response
 
+    @sync_to_async
     def _get_messages_for_llm(self) -> list[AIMessage | HumanMessage]:
         """Get last `count_messages` messages and reverse it for right order for LLM"""
 
@@ -64,6 +60,22 @@ class Chat(models.Model):
         ]
         return messages_content
 
+    @sync_to_async
+    def _save_ai_message(self, content: str):
+        Message.objects.create(
+            chat=self,
+            user=self.user,
+            is_ai_message=True,
+            content=content,
+        )
+
+    @sync_to_async
+    def get_last_ai_message(self):
+        return Message.objects.filter(
+            chat=self,
+            is_ai_message=True
+        ).last()
+
 
 class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
@@ -75,7 +87,7 @@ class Message(models.Model):
     is_user_message = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.message[:10]
+        return self.content[:10]
 
     def save(self, *args, **kwargs):
         # render markdown → HTML
