@@ -22,3 +22,13 @@ class MessageCreateForm(forms.ModelForm):
         self.helper.form_class = 'blueForms'
         self.helper.form_method = 'post'
         self.helper.form_action = reverse('chatbot:messages_create', kwargs={'pk': self.chat_id })
+
+
+
+class WsMessageCreateForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ('content',)
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4}),
+        }

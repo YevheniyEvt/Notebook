@@ -1,0 +1,15 @@
+{% if message.is_ai_message %}
+    <div class="message mb-3 align-self-start" id="chat-log" hx-swap-oob="beforeend">
+        <div class="bg-light rounded p-2">
+            <strong>Ai:</strong> {{ message.html_content|safe }}
+        </div>
+        <small class="text-muted">{{ message.created_at }}</small>
+    </div>
+{% else %}
+    <div class="message mb-3 align-self-end" id="chat-log" hx-swap-oob="beforeend">
+        <div class="bg-primary text-white rounded p-2">
+            <strong>You:</strong> <br>{{ message.content|linebreaksbr }}
+        </div>
+        <small class="text-muted">{{ message.created_at }}</small>
+    </div>
+{% endif %}

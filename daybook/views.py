@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 from django_filters.views import FilterView
 
 from daybook.filter import EntriesFilter
@@ -9,7 +9,7 @@ from daybook.models import Entries
 from mixins import HTMXViewFormMixin, HTMXDeleteViewMixin
 
 
-class EntriesListView(LoginRequiredMixin, FilterView, ListView):
+class EntriesListView(LoginRequiredMixin, FilterView):
     model = Entries
     template_name = 'daybook/entries_list.html'
     filterset_class = EntriesFilter

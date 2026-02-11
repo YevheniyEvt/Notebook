@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "bleach>=6.3.0",
+    "channels-redis>=4.3.0",
+    "channels[daphne]>=4.3.2",
     "cloudinary>=1.44.1",
     "crispy-bootstrap5>=2025.6",
     "django>=6.0",
@@ -19,7 +21,7 @@ dependencies = [
     "django-tempus-dominus>=5.1.2.17",
     "django-widget-tweaks>=1.5.0",
     "ipython>=9.8.0",
-    "langchain-openai>=1.1.7",
+    "langchain-openai>=1.1.8",
     "langgraph>=1.0.7",
     "markdown>=3.10.1",
     "mypy>=1.19.0",
