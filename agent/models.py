@@ -36,6 +36,7 @@ class Chat(models.Model):
 
     async def generate_and_save_llm_response(self) -> dict:
         llm_response = await self._send_messages_and_get_response_from_llm()
+        await self._save_chat_name(llm_response)
 
         # get last message in list - it is last answer from LLM
         llm_message_content = llm_response['messages'][-1].content
@@ -65,6 +66,12 @@ class Chat(models.Model):
             for message in messages
         ]
         return messages_content
+
+    async def _save_chat_name(self, llm_response):
+        chat_name_from_llm = llm_response.get('chat_name', None)
+        if not self.name and chat_name_from_llm:
+            self.name = chat_name_from_llm
+            await self.asave(update_fields=["name"])
 
 
 class Message(models.Model):

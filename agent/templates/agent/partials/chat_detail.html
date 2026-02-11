@@ -23,7 +23,9 @@
     </div>
 
     <div class="message-input p-3">
-        <form ws-send>
+        <form ws-send
+              _="on htmx:wsBeforeSend reset() me"
+        >
             <textarea name="message" cols="40" rows="10" class="textarea form-control" required="" id="id_text"></textarea>
             <button type="submit" class="btn btn-primary mt-2">Send</button>
         </form>
