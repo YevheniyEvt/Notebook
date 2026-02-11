@@ -1,4 +1,4 @@
-from collections.abc import Generator
+from typing import AsyncIterator, Any
 
 import markdown
 import bleach
@@ -23,10 +23,10 @@ class Chat(models.Model):
     def __str__(self):
         return self.name or f'Chat #{self.id}'
 
-    def generate_stream_response_from_llm(self) -> Generator[str, None, None]:
-        messages_content = self._get_messages_for_llm()
-        llm_stream_answer = chatbot.stream({'messages': messages_content}, stream_mode="messages")
-        for message_chunk, metadata in llm_stream_answer:
+    async def generate_stream_response_from_llm(self)  -> AsyncIterator[dict[str, Any] | Any]:
+        messages_content = await self._get_messages_for_llm()
+        llm_stream_answer = chatbot.astream({'messages': messages_content}, stream_mode="messages")
+        async for message_chunk, metadata in llm_stream_answer:
 
             # Skip system messages
             if metadata["langgraph_node"] == "llm_call_router" or metadata["langgraph_node"] == "categorize_request":
@@ -36,9 +36,15 @@ class Chat(models.Model):
 
     async def generate_and_save_llm_response(self) -> dict:
         llm_response = await self._send_messages_and_get_response_from_llm()
+
         # get last message in list - it is last answer from LLM
         llm_message_content = llm_response['messages'][-1].content
-        await self._save_ai_message(llm_message_content)
+        await Message.objects.acreate(
+            chat=self,
+            user_id=self.user_id,
+            is_ai_message=True,
+            content=llm_message_content,
+        )
         return llm_response
 
     async def _send_messages_and_get_response_from_llm(self) -> dict:
@@ -59,22 +65,6 @@ class Chat(models.Model):
             for message in messages
         ]
         return messages_content
-
-    @sync_to_async
-    def _save_ai_message(self, content: str):
-        Message.objects.create(
-            chat=self,
-            user=self.user,
-            is_ai_message=True,
-            content=content,
-        )
-
-    @sync_to_async
-    def get_last_ai_message(self):
-        return Message.objects.filter(
-            chat=self,
-            is_ai_message=True
-        ).last()
 
 
 class Message(models.Model):

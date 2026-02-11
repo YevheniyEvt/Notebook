@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 
-from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 
@@ -12,7 +11,7 @@ from agent.models import Message,Chat
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.chat_pk = self.scope["url_route"]["kwargs"]["pk"]
-        self.chat = await sync_to_async(Chat.objects.get)(
+        self.chat = await Chat.objects.aget(
             pk=self.chat_pk, user = self.scope["user"]
         )
         self.chat_group_name = f"chat_{self.chat.id}"
@@ -30,7 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         user = self.scope["user"]
-        message = await sync_to_async(Message.objects.create)(
+        message = await Message.objects.acreate(
             chat=self.chat,
             user=user,
             is_user_message=True,
@@ -42,6 +41,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 "type": "chat.message",
                 "message_id": message.id,
+
             }
         )
         logging.info(f"Send user message to group. ID: {message.id}")
@@ -50,9 +50,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def chat_message(self, event):
         message_id = event["message_id"]
-        message = await sync_to_async(Message.objects.select_related("user").get)(
-            id=message_id
-        )
+        message = await Message.objects.aget(id=message_id)
 
         html = render_to_string(
             "agent/partials/message.html",
@@ -66,7 +64,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def handle_ai_response(self):
         logging.info("Start generate and save llm_response")
         await self.chat.generate_and_save_llm_response()
-        ai_message = await self.chat.get_last_ai_message()
+        ai_message = await Message.objects.filter(
+            chat=self.chat,
+            is_ai_message=True
+        ).alast()
 
         await self.channel_layer.group_send(
             self.chat_group_name,
