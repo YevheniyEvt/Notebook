@@ -77,3 +77,66 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
         logging.info(f"Send ai message to group. ID: {ai_message.id}")
+
+
+class ChatStreamConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.chat_pk = self.scope["url_route"]["kwargs"]["pk"]
+        self.chat = await Chat.objects.aget(
+            pk=self.chat_pk, user = self.scope["user"]
+        )
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        pass
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        self.user = self.scope["user"]
+        message = await Message.objects.acreate(
+            chat=self.chat,
+            user=self.user,
+            is_user_message=True,
+            content=text_data_json["message"],
+        )
+        asyncio.create_task(self.handle_ai_response())
+        logging.info(f"Send user message. ID: {message.id}")
+
+        html = render_to_string(
+            "agent/partials/user_message.html",
+            {"message": message}
+        )
+        await self.send(text_data=html)
+
+
+    async def handle_ai_response(self):
+        logging.info("Start generate and save llm_response")
+        llm_stream_answer = self.chat.generate_stream_response_from_llm()
+        message = await Message.objects.acreate(
+            chat=self.chat,
+            user=self.user,
+            is_ai_message=True,
+        )
+        ai_message_html_container = render_to_string(
+            "agent/partials/ai_message_container.html",
+            {"message_id": message.id}
+        )
+
+        send_container = False
+        accumulate_message_content = ''
+        async for content in llm_stream_answer:
+            if not send_container:
+                await self.send(text_data=ai_message_html_container)
+                send_container = True
+
+            html = render_to_string(
+                "agent/partials/ai_message_chunk.html",
+                {"content": content, "message_id": message.id}
+            )
+            await self.send(text_data=html)
+            accumulate_message_content += content
+        logging.info(f"Streaming message finished.")
+
+        message.content = accumulate_message_content
+        await message.asave()
+

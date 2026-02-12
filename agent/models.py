@@ -26,17 +26,34 @@ class Chat(models.Model):
     async def generate_stream_response_from_llm(self)  -> AsyncIterator[dict[str, Any] | Any]:
         messages_content = await self._get_messages_for_llm()
         llm_stream_answer = chatbot.astream({'messages': messages_content}, stream_mode="messages")
+
+        # return llm_stream_answer
         async for message_chunk, metadata in llm_stream_answer:
 
+            if metadata["langgraph_node"] == "namae_for_chat":
+                try:
+                    chat_name = message_chunk.additional_kwargs.get('parsed', None).chat_name
+                except (KeyError, AttributeError):
+                    continue
+                else:
+                    await self._save_chat_name(chat_name)
+
             # Skip system messages
-            if metadata["langgraph_node"] == "llm_call_router" or metadata["langgraph_node"] == "categorize_request":
+            is_system_message = (
+                    metadata["langgraph_node"] == "llm_call_router"
+                    or metadata["langgraph_node"] == "namae_for_chat"
+                    or metadata["langgraph_node"] == "meta_data_router"
+            )
+            if is_system_message:
                 continue
+
             if message_chunk.content:
                 yield message_chunk.content
 
     async def generate_and_save_llm_response(self) -> dict:
         llm_response = await self._send_messages_and_get_response_from_llm()
-        await self._save_chat_name(llm_response)
+        chat_name_from_llm = llm_response.get('chat_name', None)
+        await self._save_chat_name(chat_name_from_llm)
 
         # get last message in list - it is last answer from LLM
         llm_message_content = llm_response['messages'][-1].content
@@ -67,8 +84,7 @@ class Chat(models.Model):
         ]
         return messages_content
 
-    async def _save_chat_name(self, llm_response):
-        chat_name_from_llm = llm_response.get('chat_name', None)
+    async def _save_chat_name(self, chat_name_from_llm):
         if not self.name and chat_name_from_llm:
             self.name = chat_name_from_llm
             await self.asave(update_fields=["name"])
@@ -88,10 +104,11 @@ class Message(models.Model):
 
     def save(self, *args, **kwargs):
         # render markdown → HTML
-        html = markdown.markdown(
-            self.content,
-            extensions=['fenced_code', 'codehilite']
-        )
-        clean_html = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
-        self.html_content = clean_html
+        if self.content:
+            html = markdown.markdown(
+                self.content,
+                extensions=['fenced_code', 'codehilite']
+            )
+            clean_html = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
+            self.html_content = clean_html
         super().save(*args, **kwargs)

@@ -1,0 +1,6 @@
+<div class="message mb-3 align-self-end" hx-swap-oob="beforeend:#chat-log">
+    <div class="bg-primary text-white rounded p-2">
+        <strong>You:</strong> <br>{{ message.content|linebreaksbr }}
+    </div>
+    <small class="text-muted">{{ message.created_at }}</small>
+</div>

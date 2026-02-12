@@ -1,25 +1,25 @@
 
 <div hx-ext="ws"
-     ws-connect="/ws/chat/{{ chat.id }}/"
+     ws-connect="/ws/chat/{{ chat.id }}/stream/"
 >
     <div class="chat-messages p-3" id="chat-log" >
         {% for message in chat.messages.all %}
-        {% if message.is_ai_message %}
-            <div class="message mb-3 align-self-start">
-                <div class="bg-light rounded p-2">
-                    <strong>Ai:</strong> {{ message.html_content|safe }}
+            {% if message.is_ai_message %}
+                <div class="message mb-3 align-self-start">
+                    <div class="bg-light rounded p-2">
+                        <strong>Ai:</strong> {{ message.html_content|safe }}
+                    </div>
+                    <small class="text-muted">{{ message.created_at }}</small>
                 </div>
-                <small class="text-muted">{{ message.created_at }}</small>
-            </div>
-        {% else %}
-            <div class="message mb-3 align-self-end">
-                <div class="bg-primary text-white rounded p-2">
-                    <strong>You:</strong> <br>{{ message.content|linebreaksbr }}
+            {% else %}
+                <div class="message mb-3 align-self-end">
+                    <div class="bg-primary text-white rounded p-2">
+                        <strong>You:</strong> <br>{{ message.content|linebreaksbr }}
+                    </div>
+                    <small class="text-muted">{{ message.created_at }}</small>
                 </div>
-                <small class="text-muted">{{ message.created_at }}</small>
-            </div>
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
     </div>
 
     <div class="message-input p-3">
