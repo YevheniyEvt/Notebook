@@ -10,6 +10,7 @@ Do not include:
 - <head>
 - <meta>
 - <body>
+Chose language for answer based on what language question from user was. NEVER ANSWER IN RU language.
 """
 
 PROGRAM_ANSWER_PROMPT = """

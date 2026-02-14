@@ -106,8 +106,7 @@ class Message(models.Model):
         return self.content[:10]
 
     def save(self, *args, **kwargs):
-        # render markdown → HTML
         if self.content:
-            html = highlight(self.content, PythonLexer(), HtmlFormatter())
+            html = highlight(self.content, PythonLexer(), HtmlFormatter(cssclass="highlight p-2"))
             self.html_content = html
         super().save(*args, **kwargs)

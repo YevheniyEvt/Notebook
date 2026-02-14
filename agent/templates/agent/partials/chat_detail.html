@@ -10,21 +10,23 @@
     <div class="chat-messages p-3" id="chat-log" >
         {% for message in chat.messages.all %}
             {% if message.is_ai_message %}
-                <div class="message mb-3">
-                    <div class="bg-light rounded p-2">
-                        <strong>Ai:</strong>
-                        {% if message.html_content %}
-                            {{ message.html_content|safe }}
-                        {% else %}
-                            {{ message.content|linebreaksbr }}
-                        {% endif %}
+                <div class="mb-3">
+                    <div class="d-flex p-2">
+                        <i class="bi bi-robot me-2"></i>
+                        <div id="ai-message-{{ messages.id }}">
+                             {% if message.html_content %}
+                                {{ message.html_content|safe }}
+                            {% else %}
+                                {{ message.content|linebreaksbr }}
+                            {% endif %}
+                        </div>
                     </div>
                     <small class="text-muted">{{ message.created_at }}</small>
                 </div>
             {% else %}
-                <div class="message mb-3">
-                    <div class="rounded p-2 highlight">
-                        <strong>You:</strong> <br>
+                <div class="mb-3">
+                    <div class="p-2 d-flex" id="user-message-{{ message.id }}">
+                       <i class="bi bi-person-fill me-2"></i>
                         {% if message.html_content %}
                             {{ message.html_content|safe }}
                         {% else %}

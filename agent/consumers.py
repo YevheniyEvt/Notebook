@@ -3,13 +3,18 @@ import json
 import logging
 
 from asgiref.sync import sync_to_async
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
 from django.template.loader import render_to_string
 
 from agent.models import Message,Chat
 from notebook import settings
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    """Generate connection with group.
+    From LLM returned one piece of full html
+    Messages to frontend send as HTML
+    """
+
     async def connect(self):
         self.chat_pk = self.scope["url_route"]["kwargs"]["pk"]
         self.chat = await Chat.objects.aget(
@@ -75,7 +80,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=html)
 
 
-class ChatStreamConsumer(AsyncWebsocketConsumer):
+class ChatStreamConsumer(AsyncJsonWebsocketConsumer):
+    """Generate connection with one socket.
+    From LLM returned chunks with HTML marked answer
+    Messages to frontend send as a JSON
+    """
+
     async def connect(self):
         self.chat_pk = self.scope["url_route"]["kwargs"]["pk"]
         self.chat = await Chat.objects.aget(
@@ -98,11 +108,16 @@ class ChatStreamConsumer(AsyncWebsocketConsumer):
         asyncio.create_task(self.handle_ai_response())
         logging.info(f"Send user message. ID: {message.id}")
 
-        html = await sync_to_async(render_to_string)(
+        html_content = await sync_to_async(render_to_string)(
             "agent/partials/user_message.html",
             {"message": message}
         )
-        await self.send(text_data=html)
+        data = {
+            "type": "user_message",
+            "html_content": html_content,
+            "message_id": message.id,
+        }
+        await self.send_json(data)
 
     async def handle_ai_response(self):
         logging.info("Start generate and save llm_response")
@@ -134,14 +149,15 @@ class ChatStreamConsumer(AsyncWebsocketConsumer):
                 data = {
                     "type": "ai_chunk",
                     "chunk": content,
+                    "message_id": message.id,
                 }
-                await self.send(text_data=json.dumps(data))
+                await self.send_json(data)
                 accumulate_message_content += content
 
             done = {
                 "type": "ai_done"
             }
-            await self.send(text_data=json.dumps(done))
+            await self.send_json(done)
             logging.info(f"Streaming message finished.")
 
             message.html_content = accumulate_message_content

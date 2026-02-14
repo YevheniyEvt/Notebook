@@ -2,7 +2,7 @@
 {% load static partials %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'agent/chat_list.css' %}">
+    <link rel="stylesheet" href="{% static 'agent/css/chat_list.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -82,85 +82,5 @@
 {% endblock content %}
 
 {% block js %}
-<script>
-document.addEventListener('click', function (e) {
-    const item = e.target.closest('.chat-item')
-    if (!item) return
-
-    document.querySelectorAll('.chat-item.active')
-        .forEach(el => el.classList.remove('active'))
-
-    item.classList.add('active')
-})
-</script>
-
-<script>
-document.body.addEventListener("htmx:wsAfterMessage", function (event) {
-
-    console.info("event:", event);
-    // сире повідомлення з бекенду
-    const raw = event.detail.message
-
-    let data
-    try {
-        data = JSON.parse(raw);
-    } catch (e) {
-        console.warn("Invalid JSON:", raw);
-    return;
-    }
-
-    // тип повідомлення від бекенду
-    if (data.type === "ai_chunk") {
-
-        const container = document.getElementById("ai-stream")
-        if (!container) return
-
-        // 1️⃣ накопичуємо buffer прямо в dataset
-        if (!container.dataset.buffer) {
-            container.dataset.buffer = ""
-        }
-
-
-        container.dataset.buffer += data.chunk
-
-        // 2️⃣ пробуємо безпечно перерендерити
-        tryRender(container)
-
-        // 3️⃣ автоскрол вниз
-        const chatLog = document.getElementById("chat-log")
-        chatLog.scrollTop = chatLog.scrollHeight
-    }
-
-    if (data.type === "ai_done") {
-        // можна очистити buffer якщо треба
-        const container = document.getElementById("ai-stream")
-        if (container) {
-            delete container.dataset.buffer
-        }
-    }
-})
-
-
-function tryRender(container) {
-
-    const buffer = container.dataset.buffer
-    if (!buffer) {
-        return
-    }
-
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(buffer, "text/html")
-
-    // якщо HTML ще зламаний — не рендеримо
-    if (doc.querySelector("parsererror")) {
-        return
-    }
-
-    // повністю замінюємо контент
-    container.innerHTML = doc.body.innerHTML
-    container.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightElement(block);
-    });
-}
-</script>
+<script defer src="{% static 'agent/js/chat_list.js' %}"></script>
 {% endblock js %}
