@@ -25,6 +25,7 @@ dependencies = [
     "langgraph>=1.0.7",
     "markdown>=3.10.1",
     "mypy>=1.19.0",
+    "pygments>=2.19.2",
     "python-decouple>=3.8",
     "python-dotenv>=1.2.1",
     "ruff>=0.14.8",

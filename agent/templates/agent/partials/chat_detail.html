@@ -1,20 +1,35 @@
 
-<div hx-ext="ws"
+<style>
+     {{ pygments_css|safe }}
+</style>
+
+<div class=""
+
      ws-connect="/ws/chat/{{ chat.id }}/stream/"
 >
     <div class="chat-messages p-3" id="chat-log" >
         {% for message in chat.messages.all %}
             {% if message.is_ai_message %}
-                <div class="message mb-3 align-self-start">
+                <div class="message mb-3">
                     <div class="bg-light rounded p-2">
-                        <strong>Ai:</strong> {{ message.html_content|safe }}
+                        <strong>Ai:</strong>
+                        {% if message.html_content %}
+                            {{ message.html_content|safe }}
+                        {% else %}
+                            {{ message.content|linebreaksbr }}
+                        {% endif %}
                     </div>
                     <small class="text-muted">{{ message.created_at }}</small>
                 </div>
             {% else %}
-                <div class="message mb-3 align-self-end">
-                    <div class="bg-primary text-white rounded p-2">
-                        <strong>You:</strong> <br>{{ message.content|linebreaksbr }}
+                <div class="message mb-3">
+                    <div class="rounded p-2 highlight">
+                        <strong>You:</strong> <br>
+                        {% if message.html_content %}
+                            {{ message.html_content|safe }}
+                        {% else %}
+                            {{ message.content|linebreaksbr }}
+                        {% endif %}
                     </div>
                     <small class="text-muted">{{ message.created_at }}</small>
                 </div>

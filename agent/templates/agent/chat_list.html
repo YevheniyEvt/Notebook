@@ -69,6 +69,7 @@
     {% if chats %}
         <div class="col-md-9 col-12 p-0 d-flex flex-column"
              id="chat-detail"
+             hx-ext="ws"
              hx-get="{% url 'chatbot:chat_detail' chats.0.id %}"
              hx-trigger="load once, rerenderMessages from:body"
         >
@@ -78,7 +79,9 @@
     </div>
 {% endpartialdef chatbot %}
 </div>
+{% endblock content %}
 
+{% block js %}
 <script>
 document.addEventListener('click', function (e) {
     const item = e.target.closest('.chat-item')
@@ -91,4 +94,73 @@ document.addEventListener('click', function (e) {
 })
 </script>
 
-{% endblock content %}
+<script>
+document.body.addEventListener("htmx:wsAfterMessage", function (event) {
+
+    console.info("event:", event);
+    // сире повідомлення з бекенду
+    const raw = event.detail.message
+
+    let data
+    try {
+        data = JSON.parse(raw);
+    } catch (e) {
+        console.warn("Invalid JSON:", raw);
+    return;
+    }
+
+    // тип повідомлення від бекенду
+    if (data.type === "ai_chunk") {
+
+        const container = document.getElementById("ai-stream")
+        if (!container) return
+
+        // 1️⃣ накопичуємо buffer прямо в dataset
+        if (!container.dataset.buffer) {
+            container.dataset.buffer = ""
+        }
+
+
+        container.dataset.buffer += data.chunk
+
+        // 2️⃣ пробуємо безпечно перерендерити
+        tryRender(container)
+
+        // 3️⃣ автоскрол вниз
+        const chatLog = document.getElementById("chat-log")
+        chatLog.scrollTop = chatLog.scrollHeight
+    }
+
+    if (data.type === "ai_done") {
+        // можна очистити buffer якщо треба
+        const container = document.getElementById("ai-stream")
+        if (container) {
+            delete container.dataset.buffer
+        }
+    }
+})
+
+
+function tryRender(container) {
+
+    const buffer = container.dataset.buffer
+    if (!buffer) {
+        return
+    }
+
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(buffer, "text/html")
+
+    // якщо HTML ще зламаний — не рендеримо
+    if (doc.querySelector("parsererror")) {
+        return
+    }
+
+    // повністю замінюємо контент
+    container.innerHTML = doc.body.innerHTML
+    container.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+}
+</script>
+{% endblock js %}
