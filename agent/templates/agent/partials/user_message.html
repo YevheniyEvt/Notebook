@@ -1,0 +1,7 @@
+<div class="mb-3">
+    <div class="p-2 d-flex" id="user-message-{{ message.id }}">
+        <i class="bi bi-person-fill me-2"></i>
+        {{ message.html_content|safe }}
+    </div>
+    <small class="text-muted">{{ message.created_at }}</small>
+</div>

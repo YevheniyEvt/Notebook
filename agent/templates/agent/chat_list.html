@@ -2,7 +2,7 @@
 {% load static partials %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'agent/chat_list.css' %}">
+    <link rel="stylesheet" href="{% static 'agent/css/chat_list.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -69,6 +69,7 @@
     {% if chats %}
         <div class="col-md-9 col-12 p-0 d-flex flex-column"
              id="chat-detail"
+             hx-ext="ws"
              hx-get="{% url 'chatbot:chat_detail' chats.0.id %}"
              hx-trigger="load once, rerenderMessages from:body"
         >
@@ -78,17 +79,8 @@
     </div>
 {% endpartialdef chatbot %}
 </div>
-
-<script>
-document.addEventListener('click', function (e) {
-    const item = e.target.closest('.chat-item')
-    if (!item) return
-
-    document.querySelectorAll('.chat-item.active')
-        .forEach(el => el.classList.remove('active'))
-
-    item.classList.add('active')
-})
-</script>
-
 {% endblock content %}
+
+{% block js %}
+<script defer src="{% static 'agent/js/chat_list.js' %}"></script>
+{% endblock js %}

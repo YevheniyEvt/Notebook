@@ -1,13 +1,14 @@
-from typing import AsyncIterator, Any
+from typing import AsyncIterator
 
-import markdown
-import bleach
 from asgiref.sync import sync_to_async
+from pygments import highlight
+from pygments.lexers import PythonLexer, HtmlLexer, JavaLexer, MarkdownLexer
+from pygments.formatters import HtmlFormatter
 
 from django.contrib.auth.models import User
 from django.db import models
 
-from agent.constants import ALLOWED_TAGS, ALLOWED_ATTRS, COUNT_MESSAGES_SEND_TO_LLM
+from agent.constants import COUNT_MESSAGES_SEND_TO_LLM
 from langchain_core.messages import AIMessage, HumanMessage
 from agent.developer_chatbot.chatbot import graph as chatbot
 
@@ -23,28 +24,47 @@ class Chat(models.Model):
     def __str__(self):
         return self.name or f'Chat #{self.id}'
 
-    async def generate_stream_response_from_llm(self)  -> AsyncIterator[dict[str, Any] | Any]:
+    async def generate_stream_response_from_llm(self)  -> AsyncIterator[str]:
         messages_content = await self._get_messages_for_llm()
         llm_stream_answer = chatbot.astream({'messages': messages_content}, stream_mode="messages")
-        async for message_chunk, metadata in llm_stream_answer:
 
-            # Skip system messages
-            if metadata["langgraph_node"] == "llm_call_router" or metadata["langgraph_node"] == "categorize_request":
+        async for message_chunk, metadata in llm_stream_answer:
+            node = metadata.get('langgraph_node')
+            if node == "namae_for_chat":
+                parsed = message_chunk.additional_kwargs.get('parsed')
+                chat_name = getattr(parsed, 'chat_name', None)
+                if chat_name:
+                    await self._save_chat_name(chat_name)
                 continue
-            if message_chunk.content:
-                yield message_chunk.content
+
+            # Skip internal messages
+            if node in ('llm_call_router', 'namae_for_chat', 'meta_data_router'):
+                continue
+
+            content = getattr(message_chunk, 'content', None)
+            if content:
+                yield content
 
     async def generate_and_save_llm_response(self) -> dict:
         llm_response = await self._send_messages_and_get_response_from_llm()
-        await self._save_chat_name(llm_response)
+        chat_name_from_llm = llm_response.get('chat_name')
+        if chat_name_from_llm:
+            await self._save_chat_name(chat_name_from_llm)
 
         # get last message in list - it is last answer from LLM
-        llm_message_content = llm_response['messages'][-1].content
+        messages = llm_response.get('messages')
+        if not messages:
+            raise ValueError("LLM returned no messages")
+        last_message = messages[-1]
+        content = getattr(last_message, 'content', None)
+        if not content:
+            raise ValueError("Last LLM message has no content")
+
         await Message.objects.acreate(
             chat=self,
             user_id=self.user_id,
             is_ai_message=True,
-            content=llm_message_content,
+            content=content,
         )
         return llm_response
 
@@ -67,9 +87,8 @@ class Chat(models.Model):
         ]
         return messages_content
 
-    async def _save_chat_name(self, llm_response):
-        chat_name_from_llm = llm_response.get('chat_name', None)
-        if not self.name and chat_name_from_llm:
+    async def _save_chat_name(self, chat_name_from_llm):
+        if not self.name:
             self.name = chat_name_from_llm
             await self.asave(update_fields=["name"])
 
@@ -87,11 +106,7 @@ class Message(models.Model):
         return self.content[:10]
 
     def save(self, *args, **kwargs):
-        # render markdown → HTML
-        html = markdown.markdown(
-            self.content,
-            extensions=['fenced_code', 'codehilite']
-        )
-        clean_html = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
-        self.html_content = clean_html
+        if self.content:
+            html = highlight(self.content, PythonLexer(), HtmlFormatter(cssclass="highlight p-2"))
+            self.html_content = html
         super().save(*args, **kwargs)
